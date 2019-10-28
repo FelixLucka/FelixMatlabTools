@@ -1,4 +1,4 @@
-function cellData = spaceTime2DynamicData(X)
+function cellData = spaceTime2DynamicData(X, szX)
 % SPACETIME2DYNAMICDATA reshapes dynamic data given as a space-time volume into a cell array
 %
 % DESCRIBTION:
@@ -9,7 +9,10 @@ function cellData = spaceTime2DynamicData(X)
 %  xCell  = spaceTime2DynamicData(xVol)
 %
 %  INPUT:
-%   X - dynamic data, the time dimension is always assumed to be the last one 
+%   X - dynamic data, the time dimension is always assumed to be the last one
+%
+%  OPTIONAL INPUT:
+%   szX - size of the dynamic data
 %
 %  OUTPUTS:
 %   cellData - the data as a cell array, each cell corresponds to the data
@@ -23,14 +26,20 @@ function cellData = spaceTime2DynamicData(X)
 %
 % See also dynamicData2SpaceTime
 
-
-dimX     = nDims(X);
-sizeX    = size(X);
-T        = sizeX(end);
-cellData = cell(1, T);
-
-for i=1:T
-    cellData{i} = sliceArray(X, dimX, i, 1);
+if(nargin < 2)
+    szX    = size(X);
 end
-    
+
+timeDim  = length(szX);
+T        = szX(end);
+
+if(T > 1)
+    cellData = cell(1, T);
+    for i=1:T
+        cellData{i} = sliceArray(X, timeDim, i, 1);
+    end
+else
+    cellData = {X};
+end
+
 end

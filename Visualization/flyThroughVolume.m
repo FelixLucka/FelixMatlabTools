@@ -1,5 +1,5 @@
 function [figureH, axesH, RGB] = flyThroughVolume(im, info, para)
-% FLYTHROUGHVOLUME plots a slice-by-slice movie of 3D volumes 
+% FLYTHROUGHVOLUME plots a slice-by-slice movie of 3D volumes
 %
 % USAGE:
 %   [figureH, axesH, RGB] = flyThroughVolume(im, info, para)
@@ -65,6 +65,7 @@ endSlice      = min(nSlice, endSlice);
 RGB = data2RGB(im, para);
 clear im
 RGB = num2cell(RGB, setdiff(1:4, dimSlice));
+RGB = cellfun(@(x) squeeze(x), RGB, 'UniformOutput', false);
 
 %%% first we print the slices
 print = checkSetInput(para, 'print', 'logical', false);
@@ -98,9 +99,13 @@ if(print)
     disp('print the chosen slices to png');
     for iSlice = slices2print
         printPara.fileName = [rootFilename '_slice' dimSliceName ...
-                                    sprintf(integerFormat, iSlice) '.png'];
-        printRGB(squeeze(RGB{iSlice}), printPara);
+            sprintf(integerFormat, iSlice) '.png'];
+        printRGB(RGB{iSlice}, printPara);
     end
+    
+    % overwrite endSlice
+    endSlice = slices2print(ceil(length(slices2print)/2));
+    
 end
 
 
@@ -112,14 +117,10 @@ if(animatedGif)
     animationPara.fps      = checkSetInput(animationPara, 'fpsMovie', 'double', fps);
     
     % call movieFromRGB.m to do the conversion
-    RGBmovie = RGB;
-    for iSlice=1:nSlice
-        RGBmovie{iSlice} = squeeze(RGBmovie{iSlice});
-    end
-    movieFromRGB(RGBmovie, animationPara);
+    movieFromRGB(RGB, animationPara);
 end
 
-            
+
 
 %%% now show the movie
 try
@@ -128,9 +129,9 @@ try
     axesH   = axes('Parent',figureH, 'YTick', zeros(1,0), 'YDir', 'reverse', ...
         'XTick', zeros(1,0), 'Layer', 'top', 'DataAspectRatio', [1 1 1]);
     box(axesH,'on'); hold(axesH,'all');
-    image(squeeze(RGB{1}),'Parent',axesH);
-    ylim(axesH, [0.5, size(squeeze(RGB{1}),1)+0.5]);
-    xlim(axesH, [0.5, size(squeeze(RGB{1}),2)+0.5]);
+    image(RGB{1},'Parent',axesH);
+    ylim(axesH, [0.5, size(RGB{1},1)+0.5]);
+    xlim(axesH, [0.5, size(RGB{1},2)+0.5]);
     imageHandleFly = get(axesH, 'Children');
     
     %%% plotting, the try block will catch an error if the figure is closed
@@ -140,20 +141,15 @@ try
         iloop = iloop + 1;
         for iSlice=1:nSlice
             tPlotFly = tic;
-            set(imageHandleFly, 'CData', squeeze(RGB{iSlice}));
+            set(imageHandleFly, 'CData', RGB{iSlice});
             set(figureH, 'Name', ['fly through volume, slice ' dimSliceName ' = ' int2str(iSlice)]);
             pause(1/fps - toc(tPlotFly))
         end
     end
-    if(print)
-        set(imageHandleFly, 'CData', squeeze(RGB{slices2print(1)}));
-        set(figureH, 'Name', ['fly through volume, slice ' dimSliceName ...
-            ' = ' int2str(slices2print(1))]);
-    else
-        set(imageHandleFly, 'CData', squeeze(RGB{endSlice}));
-        set(figureH, 'Name', ['fly through volume, slice ' dimSliceName ...
-            ' = ' int2str(endSlice)]);
-    end
+    
+    set(imageHandleFly, 'CData', RGB{endSlice});
+    set(figureH, 'Name', ['fly through volume, slice ' dimSliceName ...
+        ' = ' int2str(endSlice)]);
     
 catch exception
     switch exception.identifier

@@ -34,6 +34,11 @@ end
 
 
 dimA = ndims(A);
+
+if(ischar(dims2Spare) && strcmp(dims2Spare, 'last'))
+    dims2Spare = dimA;
+end
+
 for iDim = dimA:-1:1 
     if(not(ismember(iDim, dims2Spare)))
         A = sum(A, iDim);

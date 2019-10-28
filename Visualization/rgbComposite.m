@@ -62,8 +62,8 @@ if(anyAll(Im1 < 0) || anyAll(Im1 < 0))
 end
 
 % scale to [0 1]
-Im1 = Im1 / max(max(Im1));
-Im2 = Im2 / max(max(Im2));
+Im1 = Im1 / maxAll(Im1);
+Im2 = Im2 / maxAll(Im2);
 
 % increase the image resolution by interpolation
 resIncExp = checkSetInput(para,'resIncExp', 'double', 0);

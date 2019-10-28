@@ -71,7 +71,7 @@ end
 
 % check for histCutOff, NonNeg and noShift
 histCutOff = checkSetInput(para, 'histCutOff', '>=0', 0);
-nonNeg     = checkSetInput(para, 'nonNeg', 'logical', all(data(:) >= -eps));
+nonNeg     = checkSetInput(para, 'nonNeg', 'logical', false);
 noShift    = checkSetInput(para, 'noShift', 'logical', true);
 
 % check for negative data

@@ -1,7 +1,7 @@
 function W = warpingMatrix(v, para)
 %WARPINGMATRIX sets up a sparse matrix to warp an image wrt a flow field
 %
-% DETAILS: 
+% DETAILS:
 %   ToDo
 %
 % USAGE:
@@ -12,9 +12,9 @@ function W = warpingMatrix(v, para)
 %
 % OPTIONAL INPUTS:
 %   para - a struct containing further optional parameters:
-%       'interpolationMethod' - see interpn.m, default: linear 
+%       'interpolationMethod' - see interpn.m, default: linear
 %       'X' - cell of ndgrid volumes
-%       'gridVec' - grid vectors of the ndgrid. 
+%       'gridVec' - grid vectors of the ndgrid.
 %
 %   WARNING: warpingMatrix.m only works with grids that are equidistantly
 %   spaced in each direction (also dx might differ from dy)!!!
@@ -26,7 +26,7 @@ function W = warpingMatrix(v, para)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 18.12.2018
-%       last update     - 18.12.2018
+%       last update     - 22.05.2019
 %
 % See also warpImage
 
@@ -35,7 +35,12 @@ if(nargin < 2)
     para = [];
 end
 
-dim    = nDims(v)-1;
+if(isvector(v))
+    dim = 1;
+else
+    dim    = nDims(v)-1;
+end
+
 sizeIm = size(v);
 sizeIm = sizeIm(1:dim);
 n      = prod(sizeIm);
@@ -48,7 +53,7 @@ interpolationMethod = checkSetInput(para, 'interpolationMethod', ...
 if(dfX)
     clear X
     for iDim = 1:dim
-        gridVec{iDim} = 1:sizeIm(iDim);
+        gridVec{iDim} = (1:sizeIm(iDim))';
     end
     gridVec = checkSetInput(para, 'gridVec', 'cell', gridVec);
     
@@ -90,22 +95,26 @@ end
 switch interpolationMethod
     case 'nearest'
         for iDim=1:dim
-           dx        = gridVec{iDim}(2) - gridVec{iDim}(1);
-           ind{iDim} = round((Xintp{iDim} - gridVec{iDim}(1)) / dx + 1);
+            dx        = gridVec{iDim}(2) - gridVec{iDim}(1);
+            ind{iDim} = round((Xintp{iDim} - gridVec{iDim}(1)) / dx + 1);
         end
-        jInd = vec(sub2ind(sizeIm, ind{:}));   
+        if(dim > 1)
+            jInd = vec(sub2ind(sizeIm, ind{:}));
+        else
+            jInd = ind{:};
+        end
         iInd = (1:n)';
         wVal = ones(n,1);
     case 'linear'
         
         % compute the closed neighbours in negative direction and distance towards them
         for iDim=1:dim
-            dx        = gridVec{iDim}(2) - gridVec{iDim}(1);
+            dx        = gridVec{iDim}(2)   - gridVec{iDim}(1);
             sub{iDim} = floor((Xintp{iDim} - gridVec{iDim}(1)) / dx + 1);
-            l{iDim}   = vec(Xintp{iDim} - gridVec{iDim}(sub{iDim})); 
+            l{iDim}   = vec(Xintp{iDim} - gridVec{iDim}(sub{iDim}));
         end
         
-        % C encodes all vertices 
+        % C encodes all vertices
         C  = binaryTable(dim);
         nC = size(C,1);
         
@@ -131,7 +140,11 @@ switch interpolationMethod
             for iDim=1:dim
                 subC{iDim} = subC{iDim}(nzW);
             end
-            ind = sub2ind(sizeIm, subC{:});
+            if(dim > 1)
+                ind = sub2ind(sizeIm, subC{:});
+            else
+                ind =  subC{:};
+            end
             
             iInd = [iInd; find(nzW)];
             jInd = [jInd; ind];

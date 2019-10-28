@@ -45,7 +45,7 @@ end
 RGB = cat(3, R, G, B);
 
 
-fileName = check_and_assign_struc(para,'fileName','char','dfRGBfile.png');
+fileName = checkSetInput(para,'fileName','char','dfRGBfile.png');
 % attach '.png' is missing.
 if(length(fileName) < 4 || ~strcmp(fileName(end-3:end),'.png'))
     fileName = [fileName '.png'];
