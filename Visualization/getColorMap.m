@@ -1,15 +1,15 @@
-function cmap = getColorMap(colorStr, res, invert)
+function cmap = getColormap(colorStr, res, invert)
 % GETCOLORMAP extends Matlab's colormap.m by some more color maps, in 
 % particular by bi-drectional ones 
 %
 % DESCRIPTION:
-%   getColorMap.m can be used to generate a colormap, i.e., a N x 3 array of
+%   getColormap.m can be used to generate a colormap, i.e., a N x 3 array of
 %   values inbetween 0 and 1, represeting RGB values of a continous colour
 %   map. It adds a few colormaps to Matlab's inbuild ones, in particular 
 %   bi-directional ones
 %
 % USAGE:
-%  cmap = getColorMap('blue2red', 1000)
+%  cmap = getColormap('blue2red', 1000)
 %
 %  INPUTS:
 %   colorstr    - a string identifying the color map: 

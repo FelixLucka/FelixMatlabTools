@@ -85,7 +85,7 @@ if(histCutOff)
     
     % based on the histogram, outliers are detected and the color scale is build from the remaining values
     scaling = [scaling, 'H'];
-    aux = sort(data(:));
+    aux = sort(data(~isinf(data(:))));
     maxInd    = floor((1 - histCutOff) * numel(aux));
     clim       = [0 aux(maxInd)];
     if(nonNeg)
@@ -100,12 +100,12 @@ if(histCutOff)
 else
     
     % min/max scaing
-    clim = [0, max(data(:))];
+    clim = [0, max(data(~isinf(data(:))), [], 'omitnan')];
     if(nonNeg)
         scaling = [scaling, 'NN'];
         return
     else
-        clim(1) = min(data(:));
+        clim(1) = min(data(~isinf(data(:))), [], 'omitnan');
     end
     
 end

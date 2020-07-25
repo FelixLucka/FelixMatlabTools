@@ -1,4 +1,4 @@
-function [figureH, axisH, RGB] = visualizeImage(im, info, para)
+function [figureH, axisH, RGB, clim, scaling] = visualizeImage(im, info, para)
 % VISUALIZEIMAGE plots a 2D or 3D image or movie 
 %
 % DESCRIPTION:
@@ -136,7 +136,7 @@ switch dim
                 end 
                 
                 % convert p to RGB image
-                [RGB, ~, ~, cmap] = data2RGB(im, para);
+                [RGB, clim, scaling, cmap] = data2RGB(im, para);
                 
                 % add sensor mask to image?
                 [RGBMask noMask] = checkSetInput(para,'RGBMask', 'mixed', false);
@@ -205,7 +205,7 @@ switch dim
                             
                             %%% prepare and print all the RGBs
                             
-                            RGB = data2RGB(im,para);
+                            [RGB, clim, scaling] = data2RGB(im,para);
                             clear im
                             
                             for iFrame = 1:T

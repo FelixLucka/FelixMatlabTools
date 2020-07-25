@@ -46,7 +46,7 @@ RGB = cat(3, R, G, B);
 
 
 fileName = checkSetInput(para,'fileName','char','dfRGBfile.png');
-% attach '.png' is missing.
+% attach '.png' if it is missing.
 if(length(fileName) < 4 || ~strcmp(fileName(end-3:end),'.png'))
     fileName = [fileName '.png'];
 end

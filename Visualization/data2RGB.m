@@ -250,7 +250,7 @@ else
     end
     
     % concatenate the single color channels to an RGB
-    RGB = cat(ndims(R)+1, R, G, B);
+    RGB = cat(nDims(R)+1, R, G, B);
     
 end
 

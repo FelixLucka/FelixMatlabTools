@@ -86,75 +86,18 @@ isnanV    = isnan(v);
 v(isnanV) = 0;
 
 % compute propagated points and restrict to grid
+Xq = zeros(n, dim, 'like', v);
+
 for iDim=1:dim
-    Xintp{iDim} = X{iDim} + sliceArray(v, dim+1, iDim, true);
-    Xintp{iDim} = max(Xintp{iDim}, gridVec{iDim}(1));
-    Xintp{iDim} = min(Xintp{iDim}, gridVec{iDim}(end));
+    Xintp       = X{iDim} + sliceArray(v, dim+1, iDim, true);
+    Xintp       = max(Xintp, gridVec{iDim}(1));
+    Xintp       = min(Xintp, gridVec{iDim}(end));
+    Xq(:, iDim) = Xintp(:); 
 end
 
-switch interpolationMethod
-    case 'nearest'
-        for iDim=1:dim
-            dx        = gridVec{iDim}(2) - gridVec{iDim}(1);
-            ind{iDim} = round((Xintp{iDim} - gridVec{iDim}(1)) / dx + 1);
-        end
-        if(dim > 1)
-            jInd = vec(sub2ind(sizeIm, ind{:}));
-        else
-            jInd = ind{:};
-        end
-        iInd = (1:n)';
-        wVal = ones(n,1);
-    case 'linear'
-        
-        % compute the closed neighbours in negative direction and distance towards them
-        for iDim=1:dim
-            dx        = gridVec{iDim}(2)   - gridVec{iDim}(1);
-            sub{iDim} = floor((Xintp{iDim} - gridVec{iDim}(1)) / dx + 1);
-            l{iDim}   = vec(Xintp{iDim} - gridVec{iDim}(sub{iDim}));
-        end
-        
-        % C encodes all vertices
-        C  = binaryTable(dim);
-        nC = size(C,1);
-        
-        iInd = [];
-        jInd = [];
-        wVal = [];
-        
-        % compute weights
-        for iC=1:nC
-            subC = sub;
-            weights = ones(n, 1);
-            for iDim=1:dim
-                if(C(iC, iDim)) % vertex in positiv direction
-                    weights = weights .* l{iDim};
-                    subC{iDim} = subC{iDim} + 1;
-                else % vertex in negative direction
-                    weights    = weights .* (1-l{iDim});
-                end
-            end
-            
-            % find vertices with non-zeros weights
-            nzW = weights > 0;
-            for iDim=1:dim
-                subC{iDim} = subC{iDim}(nzW);
-            end
-            if(dim > 1)
-                ind = sub2ind(sizeIm, subC{:});
-            else
-                ind =  subC{:};
-            end
-            
-            iInd = [iInd; find(nzW)];
-            jInd = [jInd; ind];
-            wVal = [wVal; weights(nzW)];
-        end
-        
-    otherwise
-        notImpErr
-end
-
-W = sparse(iInd, jInd, wVal, n, n);
+intPara = [];
+intPara.interpolationMethod = interpolationMethod;
+% call interpolationMatrix.m
+W = interpolationMatrix(gridVec, Xq, intPara);
 
 end

@@ -80,7 +80,7 @@ switch info.type
         nSlices      = length(slices2show);
         
         % prepare slices
-        im = sliceArray(im, dimSlice, slices2show);
+        im = sliceArray(im, dimSlice, slices2show, true);
         [RGB, ~, ~, cmap] = data2RGB(im, para);
         if(length(slices2show) > 1)
             RGB = cellfun(@(x) squeeze(x), num2cell(RGB,setdiff(1:4,dimSlice)), ...

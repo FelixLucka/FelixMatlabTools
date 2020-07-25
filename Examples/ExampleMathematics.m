@@ -53,3 +53,15 @@ X = randperm(100);
 
 isequal(ind, ind2)
 
+%% compute gradients
+
+% verify that gradient of f(x) = 0.5 * |A x - b|_2^2 is given as A'*(A*x-b)
+% numerically
+A = randn(10,4);
+x = randn(4,1);
+b = randn(10,1);
+
+% see exampleFGrad.m for the function definition
+FGrad = @(x) exampleFGrad(A, x, b);
+
+results = gradientTest(FGrad, x)

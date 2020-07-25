@@ -3,7 +3,7 @@ function NH = radialNeighbourhood(R, dimMask)
 % be used for morphological operations
 %
 % DESCRIPTION:
-%   radialNeighbourhood creates the smallest mask where all pixels/voxels with a certain 
+%   radialNeighbourhood creates the smallest mask where all pixels/voxels with
 %   a certain distance to the center have been labeled true
 %
 % USAGE:
@@ -24,8 +24,7 @@ function NH = radialNeighbourhood(R, dimMask)
 % See also imclose
 
 % creaste grid vector
-dx        = 2 * R/(2 * R+1);
-xVec      = (-R + dx/2):dx:R;
+xVec      = -floor(R):floor(R);
 
 switch dimMask
     case 2
@@ -39,6 +38,6 @@ switch dimMask
        sqNormDist        = X1.^2 + X2.^2 + X3.^2 + X4.^2;
 end
 
-NH = sqNormDist < R^2;
+NH = sqNormDist <= R^2;
 
 end

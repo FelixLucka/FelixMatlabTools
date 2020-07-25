@@ -1,38 +1,35 @@
 function slices = sliceArray(A, dim, sliceIndicies, squeezeArray)
-%SLICEARRAY is a work-around that extracts slices along a specified dimension of an array 
+%SLICEARRAY is a work-around that extracts slices along a specified dimension of an array
 %
 % DESCRIPTION:
 %       sliceArray slices numerical arrays along a specified dimension
 %
 % USAGE:
-%       slices = sliceArray(A, dim, sliceIndicies)
-%       slices = sliceArray(A, dim, sliceIndicies, squeezeArray)
+%       slices = sliceArray(A, dim, sliceIndicies, squeezeFL)
+%       slices = sliceArray(A,dim,sliceIndicies,squeezeFL)
+%       slices = sliceArray(A,dim,sliceIndicies,squeezeFL)
 %
 % INPUTS:
 %       A             - input array
 %       dim           - dimension of the slices
-%       sliceIndicies - indices of the slices 
-% 
+%       sliceIndicies - indices of the slices
+%
 % OPTIONAL INPUTS:
-%       squeezeArray  - boolean controlling whether the resulting array is
-%                       squeezed
+%       squeezeArray - boolean controlling whether the resulting array is
+%                      squeezed
 %
 % OUTPUTS:
 %       slices  - output array containing the desired slices
 %
 % ABOUT:
 %       author          - Felix Lucka
-%       date            - 30.10.2018
-%       last update     - 30.10.2018
+%       date            - 03.09.2017
+%       last update     - 03.12.2019
 %
-% See also insertIntoArray
+% See also cutArray
 
-% check user defined value for squeezeArray, otherwise assign default value
-if(nargin < 4)
-    squeezeArray = false;
-end
 
-% 
+
 switch ndims(A)
     case 2
         switch dim
@@ -41,7 +38,11 @@ switch ndims(A)
             case 2
                 slices = A(:,sliceIndicies);
             otherwise
-                error('dim > ndims(A)')
+                if(isequal(sliceIndicies, 1))
+                    slices = A;
+                else
+                    error('dim > ndims(A)')
+                end
         end
     case 3
         switch dim
@@ -52,7 +53,11 @@ switch ndims(A)
             case 3
                 slices = A(:,:,sliceIndicies);
             otherwise
-                error('dim > ndims(A)')
+                if(isequal(sliceIndicies, 1))
+                    slices = A;
+                else
+                    error('dim > ndims(A)')
+                end
         end
     case 4
         switch dim
@@ -65,8 +70,12 @@ switch ndims(A)
             case 4
                 slices = A(:,:,:,sliceIndicies);
             otherwise
-                error('dim > ndims(A)')
-        end 
+                if(isequal(sliceIndicies, 1))
+                    slices = A;
+                else
+                    error('dim > ndims(A)')
+                end
+        end
     case 5
         switch dim
             case 1
@@ -80,8 +89,12 @@ switch ndims(A)
             case 5
                 slices = A(:,:,:,:,sliceIndicies);
             otherwise
-                error('dim > ndims(A)')
-        end 
+                if(isequal(sliceIndicies, 1))
+                    slices = A;
+                else
+                    error('dim > ndims(A)')
+                end
+        end
     case 6
         switch dim
             case 1
@@ -97,14 +110,18 @@ switch ndims(A)
             case 6
                 slices = A(:,:,:,:,:,sliceIndicies);
             otherwise
-                error('dim > ndims(A)')
-        end 
+                if(isequal(sliceIndicies, 1))
+                    slices = A;
+                else
+                    error('dim > ndims(A)')
+                end
+        end
     otherwise
         notImpErr
 end
 
-if(squeezeArray)
-   slices = squeeze(slices); 
+if(nargin > 3 && squeezeArray)
+    slices = squeeze(slices);
 end
 
 end

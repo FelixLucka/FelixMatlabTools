@@ -20,20 +20,23 @@ function [cMap, res] = assignColorMap(para)
 %
 % See also getColorMap
 
-
 if(isfield(para, 'colorMap'))
     switch class(para.colorMap)
         case 'double'
             cMap = para.colorMap;
         case 'char'
             res  = checkSetInput(para, 'res', 'i,>0', 10001);
-            cMap = getColorMap(para.colorMap, res);
+            cMap = getColormap(para.colorMap, res);
         otherwise
             error('A color map must be provided as a Nx3 matrix or a string')
     end
 else
     res  = 10001;
-    cMap = getColorMap('parula', res);
+    cMap = getColormap('parula', res);
+end
+
+if(isfield(para, 'flipColorMap') && para.flipColorMap)
+    cMap = flipud(cMap);
 end
 
 res = size(cMap, 1);
