@@ -1,4 +1,4 @@
-function framedRGB = addFrameRGB(RGB, framesize, frameColor)
+function framedRGB = addFrameRGB(RGB, frameSize, frameColor)
 % FRAMEDRGB adds a frame to an image given as a RGB
 %
 %  USAGE:
@@ -19,12 +19,12 @@ function framedRGB = addFrameRGB(RGB, framesize, frameColor)
 %
 % See also addColorFrame maskRGB
 
-Nx = size(RGB,1) + 2*framesize;
-Ny = size(RGB,2) + 2*framesize;
+Nx = size(RGB,1) + 2*frameSize;
+Ny = size(RGB,2) + 2*frameSize;
 
 framedRGB = cat(3,frameColor(1)*ones(Nx,Ny,'like',frameColor),...
                   frameColor(2)*ones(Nx,Ny,'like',frameColor),...
                   frameColor(3)*ones(Nx,Ny,'like',frameColor));
-framedRGB(framesize+1:end-framesize, framesize+1:end-framesize,:) = RGB;
+framedRGB(frameSize+1:end-frameSize, frameSize+1:end-frameSize,:) = RGB;
 
 end

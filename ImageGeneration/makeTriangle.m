@@ -1,9 +1,12 @@
 function triangle = makeTriangle(Nxyz, gridLim, parameter, nSubDiv)
-%MAKERECTANGLE creates a triangle that is  within a 2D or 3D grid.
+%MAKERECTANGLE creates a simple triangle within a 2D or 3D grid.
 %
 % DESCRIPTION:
-%       makeRectangle creates an image of a filled rectangle within a
-%       two or three-dimensional grid with Nxyz voxels. 
+%       makeRectangle creates an image of a filled triangle within a
+%       two or three-dimensional grid with Nxyz voxels. One side of the
+%       triangle is aligned with the x-axis, the other two sides have the
+%       same length. The triangle is pointing into positive y-direction
+%       (think of the "play" button")
 %
 % USAGE:
 %       triangle = makeTriangle([100,100], [0,1;0,1], [0.3,0.3 , 0.2, 0.4], 2)
@@ -12,7 +15,11 @@ function triangle = makeTriangle(Nxyz, gridLim, parameter, nSubDiv)
 %       Nxyz    - number of voxels in each spatial direction 
 %       gridLim - ndim x 2 array with the spatial limits of the grid 
 %       center  - centre of the rectangle as [x,y] or [x,y,z]
-%       parameter  - parameter of the triangle
+%       parameter  - parameter of the triangle:
+%           parameter(1): x-coordinate of left upper corner
+%           parameter(2): y-coordinate of left upper corner
+%           parameter(3): length of side aligned with the x-axis
+%           parameter(4): height of triangle
 %
 % OPTIONAL INPUTS:
 %       nSubDiv - The voxels will be subdived to obtain a smooth representation
@@ -25,7 +32,7 @@ function triangle = makeTriangle(Nxyz, gridLim, parameter, nSubDiv)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 27.06.2019
-%       last update     - 27.06.2019
+%       last update     - 16.11.2021
 %
 % See also
 

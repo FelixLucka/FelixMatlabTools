@@ -63,16 +63,25 @@ else
 end
     
 % check for vector valued data
-vector = checkSetInput(para, 'vector', 'logical', false);
-if(vector)
+dataType = checkSetInput(para, 'dataType', {'scalar', 'vector', '2dim'}, 'scalar');
+switch dataType
+    case 'vector'
     % reduce to amplidute of the vectors
     data      = sqrt(sum(data.^2, ndims(data)));
+    case '2dim'
+        clim = zeros(2,2);
+        scaling = cell(2,1);
+        para_1dim                = para;
+        para_1dim.dataType       = 'scalar'; 
+        [clim(1,:), scaling{1}]  = determineClim(sliceArray(data, ndims(data), 1, true), para_1dim);
+        [clim(2,:), scaling{2}]  = determineClim(sliceArray(data, ndims(data), 2, true), para_1dim);
+        return
 end
 
 % check for histCutOff, NonNeg and noShift
 histCutOff = checkSetInput(para, 'histCutOff', '>=0', 0);
 nonNeg     = checkSetInput(para, 'nonNeg', 'logical', false);
-noShift    = checkSetInput(para, 'noShift', 'logical', true);
+noShift    = checkSetInput(para, 'noShift', 'logical', false);
 
 % check for negative data
 if(nonNeg && any(data(:) < -eps))
@@ -85,18 +94,23 @@ if(histCutOff)
     
     % based on the histogram, outliers are detected and the color scale is build from the remaining values
     scaling = [scaling, 'H'];
-    aux = sort(data(~isinf(data(:))));
-    maxInd    = floor((1 - histCutOff) * numel(aux));
-    clim       = [0 aux(maxInd)];
+    aux     = sort(data(~isinf(data(:))));
+    maxInd  = floor((1 - histCutOff) * numel(aux));
+    clim    = [0 aux(maxInd)];
+    if(isequal(clim,[0,0]))
+        clim = [0, aux(end)];
+    end
     if(nonNeg)
         scaling = [scaling, 'NN'];
         return
     else
         minInd    = ceil(histCutOff * numel(aux));
         clim(1)   = aux(minInd);
+        if(isequal(clim,[0,0]))
+            clim = [aux(1), aux(end)];
+        end
     end
     clear aux
-    
 else
     
     % min/max scaing

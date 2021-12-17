@@ -6,7 +6,7 @@
 % ABOUT:
 % 	author          - Felix Lucka
 % 	date            - 07.01.2019
-%  	last update     - 07.01.2019
+%  	last update     - 16.11.2021
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -99,6 +99,23 @@ figure();
 subplot(1, 3, 1); imagesc(im);
 subplot(1, 3, 2); imagesc(imWarped1);
 subplot(1, 3, 3); imagesc(imWarped2);
+
+%% more general image interpolation
+close all
+
+n = 100;
+m = 200;
+x  = linspace(-1,1,n);
+y  = linspace(-1,1,m);
+
+nq = 133;
+mq = 133;
+xq = linspace(-1,1,nq);
+yq = linspace(-1,1,mq);
+
+% setup interpolation
+weightsIndices = interpolationOperatorFixedGrids('setup', {x,y,xq,yq}, 'linear');
+
 
 %% Misc
 

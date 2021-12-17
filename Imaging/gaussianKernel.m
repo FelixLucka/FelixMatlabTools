@@ -22,7 +22,7 @@ function kernel = gaussianKernel(n, sigma, cutOff)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 10.03.2019
-%       last update     - 10.03.2019
+%       last update     - 16.11.2021
 %
 % See also
 
@@ -45,15 +45,20 @@ if(isscalar(cutOff))
     cutOff = repmat(cutOff, n, 1);
 end
 
-kernel = 1;
-for iDim = 1:n
-    width      = ceil(cutOff(iDim) * sigma(iDim));
-    aux        = ones(1, n);
-    aux(iDim)  = 2*width + 1;
-    arg1D      = zeros(aux);
-    arg1D(:)   = (-width:width).^2 / (2 * sigma(iDim)^2);
-    kernel     = repmat(kernel, aux);
-    kernel     = bsxfun(@plus, kernel, arg1D);
+if(n > 1)
+    kernel = 1;
+    for iDim = 1:n
+        width      = ceil(cutOff(iDim) * sigma(iDim));
+        aux        = ones(1, n);
+        aux(iDim)  = 2*width + 1;
+        arg1D      = zeros(aux);
+        arg1D(:)   = (-width:width).^2 / (2 * sigma(iDim)^2);
+        kernel     = repmat(kernel, aux);
+        kernel     = bsxfun(@plus, kernel, arg1D);
+    end
+else
+    width      = ceil(cutOff * sigma);
+    kernel     = (-width:width).^2 / (2 * sigma^2);
 end
 
 % apply ex0

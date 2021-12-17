@@ -1,6 +1,6 @@
-function cmap = getColormap(colorStr, res, invert)
+function cmap = getColormap(colorStr, res, invert, para)
 % GETCOLORMAP extends Matlab's colormap.m by some more color maps, in 
-% particular by bi-drectional ones 
+% particular by bi-directional and two-dimensional ones 
 %
 % DESCRIPTION:
 %   getColormap.m can be used to generate a colormap, i.e., a N x 3 array of
@@ -18,10 +18,20 @@ function cmap = getColormap(colorStr, res, invert)
 %                   - 'blue2red' and 'cool2hot' give bi-drectional ones
 %                     by stacking two color maps on top of each other with
 %                     one of them inverted 
+%                   - 'inferno', 'magma', 'plasma', 'viridis' are the
+%                     corresponding colormaps from python, taken from Ander Biguri:
+%                     Ander Biguri (2021). Perceptually uniform colormaps 
+%                     (https://www.mathworks.com/matlabcentral/fileexchange/51986-perceptually-uniform-colormaps), 
+%                     MATLAB Central File Exchange. Retrieved January 2, 2021.
+%                   - 'hv2dim', 'hs2dim', 'hsv2dim', 'red2dim', 'blue2dim',
+%                     'blue2red2dim': 2 dimensional color maps where one dimesion is
+%                      encoded in the hue channel                  
 %
 %  OPTIONAL INPUTS:
 %   res         - the resolution of the color map (default: 1001)
 %   invert      - flip the colormap upside down
+%   hueMax      - for 2dim colour maps 
+%   hueMin      - for 2dim colour maps
 %   
 %  OUTPUTS:
 %   cmap        - an array of size [res, 3] representing RGB channels of the color map
@@ -29,7 +39,7 @@ function cmap = getColormap(colorStr, res, invert)
 % ABOUT:
 %   author          - Felix Lucka
 %   date            - 13.12.2017
-%   last update     - 05.11.2018
+%   last update     - 16.11.2021
 %
 % See also assignColorMap, str2RGB
 
@@ -41,6 +51,11 @@ end
 % check user defined value for invert, otherwise assign default value
 if(nargin < 3)
     invert = false;
+end
+
+% check user defined value for para, otherwise assign default value
+if(nargin < 4)
+    para = [];
 end
 
 cmap = ones(res, 3);
@@ -107,6 +122,38 @@ switch colorStr
         
         % get the k-Wave color scale (kWave needs to be on the path!)
         cmap = getColorMap(res + mod(res, 2));
+        
+    case {'inferno', 'magma', 'plasma', 'viridis'}
+        
+        % load python color maps provided by Ander Biguri:
+        % Ander Biguri (2021). Perceptually uniform colormaps (https://www.mathworks.com/matlabcentral/fileexchange/51986-perceptually-uniform-colormaps), MATLAB Central File Exchange. Retrieved January 2, 2021.
+        eval(['cmap = ' colorStr '(' int2str(res) ');']);
+        
+    case {'hv2dim', 'hs2dim', 'hsv2dim', 'red2dim', 'blue2dim', 'blue2red2dim'}
+        
+        % 2 dimensional colour maps
+        hueMax = checkSetInput(para, 'hueMax', '>=0', 2/3);
+        hueMin = checkSetInput(para, 'hueMin', '>=0', 0);
+        
+        [X,Y] = meshgrid(linspace(hueMin, hueMax, res), linspace(0,1,res));
+        switch colorStr
+            case 'hv2dim'
+                cmap  = cat(3, X, ones(size(X)), Y);
+            case 'hs2dim'
+                cmap  = cat(3, X, Y, ones(size(X)));
+            case 'hsv2dim'
+                cmap  = cat(3, X, Y, Y);
+            case 'red2dim'
+                cmap  = cat(3, ones(size(X)), Y', Y);
+            case 'blue2dim'
+                cmap  = cat(3, 2/3 * ones(size(X)), Y', Y);
+            case 'blue2red2dim'
+                cmapRed   = cat(3, ones(size(X)), Y', Y);
+                cmapBlue  = cat(3, 2/3 * ones(size(X)), Y', Y);
+                cmap      = cat(2, flip(cmapBlue, 2), cmapRed);
+                cmap      = cmap(:,1:2:end,:);
+        end
+        cmap = hsv2rgb(cmap);
         
     otherwise
         error(['Unkown colorstr: ' colorStr]);

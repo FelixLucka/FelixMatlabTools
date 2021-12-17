@@ -21,6 +21,10 @@ isequal(sumAll(X), sum(X(:)))
 isequal(minAll(X), min(X(:)))
 isequal(maxAll(X), max(X(:)))
 
+% minAll / maxAll can also return the sub-scripts of the min/max
+[value, ijk] = minAll(X)
+[value, ijk] = maxAll(X)
+
 % maxAllBut/sumAll applies the max/sum function along all dimensions of A except the
 % specified one
 result = maxAllBut(X, 2);

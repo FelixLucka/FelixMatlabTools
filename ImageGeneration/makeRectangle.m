@@ -25,7 +25,7 @@ function rectangle = makeRectangle(Nxyz, gridLim, center, edgeLength, nSubDiv)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 25.06.2019
-%       last update     - 25.06.2019
+%       last update     - 16.11.2021
 %
 % See also
 

@@ -33,6 +33,7 @@ end
 % get size of volume and create output mask
 dim                 = nDims(im);
 kernel              = gaussianKernel(dim, 1, 1);
+%mask_org            = mask;
 im_ex               = im;
 
 for i=1:times

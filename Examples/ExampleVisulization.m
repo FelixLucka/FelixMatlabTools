@@ -7,7 +7,7 @@
 % ABOUT:
 % 	author          - Felix Lucka
 % 	date            - 05.02.2019
-%  	last update     - 25.02.2019
+%  	last update     - 16.11.2021
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -27,7 +27,7 @@ visualizeImage(im, [], para);
 
 % set color map
 para          = [];
-para.colorMap = 'gray';
+para.colorMap = 'viridis';
 visualizeImage(im, [], para);
 
 % set values of the image within a mask to 0

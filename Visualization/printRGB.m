@@ -52,6 +52,19 @@ if(length(fileName) < 4 || ~strcmp(fileName(end-3:end),'.png'))
 end
 
 % use imwrite to print it
-imwrite(RGB, fileName,'png','bitdepth',8)
+errorCount = 0;
+while(1)
+    try
+        imwrite(RGB, fileName,'png','bitdepth',8)
+        break
+    catch ME
+        if (errorCount == 10 || ~strcmp(ME.identifier,'MATLAB:imagesci:png:libraryFailure'))
+            rethrow(ME)
+        else
+            errorCount = errorCount + 1;
+            pause(0.1)
+        end
+    end
+end
 
 end
