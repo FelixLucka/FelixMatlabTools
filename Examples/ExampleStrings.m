@@ -6,7 +6,7 @@
 % ABOUT:
 % 	author          - Felix Lucka
 % 	date            - 15.01.2019
-%  	last update     - 15.01.2019
+%  	last update     - 22.10.2023
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -22,20 +22,20 @@ convertSec(60 * 60) % 60*60 seconds = 1h
 %   genPathAndFilename.m takes a cell of strings or structs and constructs a
 %   file path and file name from it. 
 
-infoCell = {'ID1', 'ID2', 'ID3'}
+info_cell = {'ID1', 'ID2', 'ID3'}
 
-genPara = [];
+gen_para = [];
 
 % generation parameters (see documentation)
-genPara.mkDir    = false;
-genPara.prefix   = 'a';
-genPara.postfix  = 'b';
-genPara.output   = true;
-genPara.filenameSep    = '--';
-genPara.pathnameSep  = '\';
-genPara.sepAtEnd = true;
+gen_para.mkDir    = false;
+gen_para.prefix   = 'a';
+gen_para.postfix  = 'b';
+gen_para.output   = true;
+gen_para.filenameSep    = '--';
+gen_para.pathnameSep  = '\';
+gen_para.sepAtEnd = true;
 
-[path, ~, filename] = genPathAndFilename(infoCell, genPara)
+[path, ~, filename] = genPathAndFilename(info_cell, gen_para)
 
 %% modifications of num2str and its variants 
 

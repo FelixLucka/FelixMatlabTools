@@ -6,7 +6,7 @@
 % ABOUT:
 % 	author          - Felix Lucka
 % 	date            - 19.12.2018
-%  	last update     - 19.12.2018
+%  	last update     - 22.10.2023
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -67,8 +67,8 @@ season = chooseInput('What is your favorite season of the year?', 'string', ...
 %% chooseFile and chooseSubDir can be used to promt the user to specify dirs and files
 
 % choose a subfolder of the toolbox
-subDir = chooseSubDir(pwd)
+sub_dir = chooseSubDir(pwd)
 
 % choose a file in that subfolder
-choice = chooseFile([pwd filesep subDir], '*.m')
+choice = chooseFile([pwd filesep sub_dir], '*.m')
 

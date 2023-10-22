@@ -26,7 +26,7 @@ function [indices, v] = localMinima(V)
 %
 % See also min, max, cumMinMax
 
-dim     = numDim(V);
+dim     = nDims(V);
 indices = [];
 v       = [];
 

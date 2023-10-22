@@ -27,7 +27,7 @@ function RGB = arrangeRGB(RGB_cell, ratio, frame_sz, frame_colour)
 % See also
 
 % check user defined value for ratio, otherwise assign default value
-if(nargin < 2)
+if(nargin < 2 | isempty(ratio))
    screen_info  = get( groot, 'Screensize' );
    ratio        = screen_info(3)/screen_info(4);
 end

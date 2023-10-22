@@ -6,7 +6,7 @@
 % ABOUT:
 % 	author          - Felix Lucka
 % 	date            - 28.02.2019
-%  	last update     - 28.02.2019
+%  	last update     - 22.10.2023
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -20,20 +20,20 @@ im = imread('circles.png');
 % be used for morphological operations
 NH = radialNeighbourhood(7, 2)
 
-imClosed = imclose(im, NH);
+im_closed = imclose(im, NH);
 
 %extractBoundary extracts a boundary mask of logical matrix or volume
-imBoundaryMask = extractBoundary(im);
+im_boundary_mask = extractBoundary(im);
 
 % convexClosure takes a binary image and fills it by closing the convex
 % hull
-imConvexClosure = convexClosure(im);
+im_convex_closure = convexClosure(im);
 
 
 figure();
 subplot(1,4,1); imagesc(im);
-subplot(1,4,2); imagesc(imClosed);
-subplot(1,4,3); imagesc(imBoundaryMask);
-subplot(1,4,4); imagesc(imConvexClosure);
+subplot(1,4,2); imagesc(im_closed);
+subplot(1,4,3); imagesc(im_boundary_mask);
+subplot(1,4,4); imagesc(im_convex_closure);
 
 

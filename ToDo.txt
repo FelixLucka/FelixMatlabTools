@@ -1,0 +1,5 @@
+ToDo:
+- big renaming into consistent scheme at some point
+- document Interfaces functions
+- replace if(output) disp() end with own function 
+- go through Examples at the end to see if everything runs

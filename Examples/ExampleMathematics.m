@@ -6,7 +6,7 @@
 % ABOUT:
 % 	author          - Felix Lucka
 % 	date            - 31.01.2019
-%  	last update     - 31.01.2019
+%  	last update     - 22.10.2023
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -39,17 +39,17 @@ n = 100;
 A = randn(n, n);
 A = A' * A;
 
-[maxEigSquare, info] = powerIteration(@(x) A * x, [n, 1], 10^-12, 1, true);
+[max_eig_square, info] = powerIteration(@(x) A * x, [n, 1], 10^-12, 1, true);
 
-maxEigSquare
+max_eig_square
 norm(A)
 
 %% sorting
 
 %insertionSort is a simple insertion sort implementation
 X = randperm(100);
-[Xsort, ind]   = insertionSort(X);
-[Xsort2, ind2] = sort(X);
+[X_sort, ind]   = insertionSort(X);
+[X_sort2, ind2] = sort(X);
 
 isequal(ind, ind2)
 

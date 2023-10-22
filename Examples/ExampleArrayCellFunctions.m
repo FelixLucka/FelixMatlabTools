@@ -6,7 +6,7 @@
 % ABOUT:
 % 	author          - Felix Lucka
 % 	date            - 17.12.2018
-%  	last update     - 17.12.2018
+%  	last update     - 22.10.2023
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -33,7 +33,7 @@ result = sumAllBut(X, 2);
 isequal(result(1), sum(vec(X(:,1,:))))
 
 % MinMax returns [min(X(:)), max(X(:))]
-[minX, maxX] = minMax(X)
+[min_X, max_X] = minMax(X)
 
 % anyAll(X) is the same as any(X(:))
 X = randn(100) > 0;
@@ -41,9 +41,9 @@ isequal(anyAll(X), any(X(:)))
 
 
 X = randn(100, 1);
-[cumMinX, cumMaxX] = cumMinMax(X);
+[cum_min_X, cum_max_X] = cumMinMax(X);
 figure();
-plot([X, cumMinX, cumMaxX])
+plot([X, cum_min_X, cum_max_X])
 
 % firstNonZero projects an n-dim array onto the first non zero value
 %along a specified dimension
@@ -104,12 +104,12 @@ vec(X)
 % repIntoCell returns a cell array of a given size with each cell containing the 
 % same object
 X     = magic(5)
-Xcell = repIntoCell(X, [1,2])
+X_cell = repIntoCell(X, [1,2])
 
 % applyToMatOrCell applies a function handle to the input if the input is
 % a numeric, or to each cell of a cell array
 applyToMatOrCell(@(x) sum(x), X)
-applyToMatOrCell(@(x) sum(x), Xcell)
+applyToMatOrCell(@(x) sum(x), X_cell)
 
 
 %% modifications

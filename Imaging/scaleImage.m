@@ -54,8 +54,8 @@ end
 arg_out_str     = '[';
 arg_out_str_new = '[';
 for i_dim=1:dim
-    arg_out_str     = [arg_out_str 'im{' int2str(i_dim) '},'];
-    arg_out_str_new = [arg_out_str_new 'im_new{' int2str(i_dim) '},'];
+    arg_out_str     = [arg_out_str 'X{' int2str(i_dim) '},'];
+    arg_out_str_new = [arg_out_str_new 'X_new{' int2str(i_dim) '},'];
 end
 arg_out_str    = [arg_out_str(1:end-1), ']'];
 arg_out_str_new = [arg_out_str_new(1:end-1), ']'];
@@ -69,7 +69,7 @@ switch interpolation_method
         % compute nearest neighbour index
         for i_dim=1:dim
             dx        = grid_vec{i_dim}(2) - grid_vec{i_dim}(1);
-            sub{i_dim} = round((im_new{i_dim} - grid_vec{i_dim}(1)) / dx + 1);
+            sub{i_dim} = round((X_new{i_dim} - grid_vec{i_dim}(1)) / dx + 1);
         end
         
         im_new = reshape(im(sub2ind(size_im, sub{:})), size_new);
@@ -80,9 +80,9 @@ switch interpolation_method
         
         % compute the closed neighbours in negative direction and distance towards them
         for i_dim=1:dim
-            dx        = grid_vec{i_dim}(2) - grid_vec{i_dim}(1);
-            sub{i_dim} = floor((XNew{i_dim} - grid_vec{i_dim}(1)) / dx + 1);
-            l{i_dim}   = vec(XNew{i_dim} - grid_vec{i_dim}(sub{i_dim}));
+            dx         = grid_vec{i_dim}(2) - grid_vec{i_dim}(1);
+            sub{i_dim} = floor((X_new{i_dim} - grid_vec{i_dim}(1)) / dx + 1);
+            l{i_dim}   = vec(X_new{i_dim} - grid_vec{i_dim}(sub{i_dim}));
         end
         
         % C encodes all vertices
@@ -119,7 +119,7 @@ switch interpolation_method
         end
         
         F = griddedInterpolant(X{:}, im, interpolation_method, 'none');
-        im_new = F(XNew{:});
+        im_new = F(X_new{:});
 end
 
 

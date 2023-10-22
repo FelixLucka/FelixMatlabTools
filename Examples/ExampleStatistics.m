@@ -6,7 +6,7 @@
 % ABOUT:
 % 	author          - Felix Lucka
 % 	date            - 31.01.2019
-%  	last update     - 31.01.2019
+%  	last update     - 22.10.2023
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -38,13 +38,13 @@ hist(samples, 1:3)
 
 %% cov2corr converts a covariance matrix to a correlation matrix
 
-X        = randn(100,10) .* repmat(1:10, 100, 1);
-covX     = cov(X);
-corrX    = cov2corr(covX);
+X         = randn(100,10) .* repmat(1:10, 100, 1);
+cov_X     = cov(X);
+corr_X    = cov2corr(cov_X);
 
 figure();
-subplot(1, 2, 1); imagesc(covX);
-subplot(1, 2, 2); imagesc(corrX);
+subplot(1, 2, 1); imagesc(cov_X);
+subplot(1, 2, 2); imagesc(corr_X);
 
 %% noise generation
 

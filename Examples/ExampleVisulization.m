@@ -7,7 +7,7 @@
 % ABOUT:
 % 	author          - Felix Lucka
 % 	date            - 05.02.2019
-%  	last update     - 16.11.2021
+%  	last update     - 22.10.2023
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -153,7 +153,7 @@ n   = 256;
 x   = linspace(-3,3,n);
 im1 = exp( - x.^2 / 2);
 im1 = im1' * im1;
-im2 = phantom(n);
+im2 = max(phantom(n), 0);
 
 % overlay im1 in hot color scale on im2 in gray scale
 para = [];
@@ -192,13 +192,14 @@ subplot(1,3,2); imagesc(im2); colormap gray
 subplot(1,3,3); image(RGB)
 
 % arrange multipe RGBs to one
-RGBcell = {};
-nRGB    = 14;
-for iRGB=1:nRGB
-    RGBcell{iRGB} = cat(3, iRGB/nRGB * ones(100,100), randn(100,100), rand(100,100));
+RGB_cell = {};
+n_RGB    = 14;
+for i_RGB=1:n_RGB
+    RGB_cell{i_RGB} = cat(3, i_RGB/n_RGB * ones(100,100), randn(100,100), rand(100,100));
 end
     
-RBG = arrangeRGB(RGBcell, [], 30, str2RGB('green'));
+RGB = arrangeRGB(RGB_cell, [], 30, str2RGB('green'));
+figure(); image(RGB)
 
 %% volume rendering
 ccc
@@ -234,13 +235,13 @@ isoSurfacePlot(vol, [], para);
 ccc
 
 X        = randn(333,33) .* repmat(1:33, 333, 1);
-covMat   = cov(X);
+cov_mat   = cov(X);
 
 para = [];
-covariancePlot(covMat, para);
+covariancePlot(cov_mat, para);
  
 para.plotCorr = true;
-covariancePlot(covMat, para);
+covariancePlot(cov_mat, para);
 
 %% contour plots
 ccc
@@ -248,10 +249,10 @@ ccc
 % extractContourLines extracts the countour lines from the contour matrix
 % % retruned by contour.m
 C = contour(peaks(200)); close all force
-[LinesCell, Values] = extractContourLines(C);
-cMap                = getColormap('green',length(LinesCell));
+[lines_cell, values] = extractContourLines(C);
+c_map                = getColormap('green',length(lines_cell));
 figure();
-for i=1:length(LinesCell)
-    plot(LinesCell(i).x, LinesCell(i).y, 'Color', cMap(i,:), 'LineWidth', 1); 
+for i=1:length(lines_cell)
+    plot(lines_cell(i).x, lines_cell(i).y, 'Color', c_map(i,:), 'LineWidth', 1); 
     hold on
 end

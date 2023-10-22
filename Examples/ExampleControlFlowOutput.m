@@ -6,7 +6,7 @@
 % ABOUT:
 % 	author          - Felix Lucka
 % 	date            - 16.01.2019
-%  	last update     - 16.01.2019
+%  	last update     - 22.10.2023
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -45,10 +45,10 @@ dispBlanc(4)
 
 % rewindAndPrint can be used to print status updates while overwriting the
 % old status
-Nchar = 0;
+n_char = 0;
 fprintf('status: ')
 for i=1:100
-    Nchar =  rewindAndPrint([int2str(i) '%%'], Nchar);
+    n_char =  rewindAndPrint([int2str(i) '%%'], n_char);
     pause(1/i)
 end
 
