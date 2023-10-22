@@ -1,4 +1,4 @@
-function tf = isMonotonic(f, strictInequality)
+function tf = isMonotonic(f, strict_inequality)
 %ISMONOTONIC checks if the values in a given vector increase monotonically 
 %
 % DESCRIPTION: 
@@ -25,13 +25,13 @@ function tf = isMonotonic(f, strictInequality)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 01.11.2018
-%       last update     - 01.11.2018
+%       last update     - 24.09.2023
 %
 % See also sort
 
 % check user defined value for strictInequality, otherwise assign default value
 if(nargin < 2)
-    strictInequality = false;
+    strict_inequality = false;
 end
 
 if(isvector(f))
@@ -40,7 +40,7 @@ else
     error('input f must be a vector')
 end
 
-if(strictInequality)
+if(strict_inequality)
     tf = all(d >  0) | all(d <  0);
 else
     tf = all(d >= 0) | all(d <= 0);

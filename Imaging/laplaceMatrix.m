@@ -1,4 +1,4 @@
-function L = laplaceMatrix(dimX, BC)
+function L = laplaceMatrix(dim_X, BC)
 %LAPLACEMATRIX computes the matrix representation of the laplacian operator
 % 
 % DESCRIPTION:
@@ -11,7 +11,7 @@ function L = laplaceMatrix(dimX, BC)
 %  Describtion: https://en.wikipedia.org/wiki/Kronecker_sum_of_discrete_Laplacians
 %
 %  INPUTS:
-%   dimX - array with the size the numerical array x to which it should be applied
+%   dim_X - array with the size the numerical array x to which it should be applied
 %   BC   - boundary conditions, '0' or 'NB'
 %
 %  OUTPUTS:
@@ -20,28 +20,28 @@ function L = laplaceMatrix(dimX, BC)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 01.11.2018
-%       last update     - 01.11.2018
+%       last update     - 05.09.2023
 %
 % See also kron
 
 
-for iDim = 1:length(dimX)
-    onesVec = ones(dimX(iDim),1);
-    Dx{iDim} = spdiags([-onesVec,2*onesVec,-onesVec], [-1 0 1], dimX(iDim),dimX(iDim));
+for i_dim = 1:length(dim_X)
+    ones_vec  = ones(dim_X(i_dim),1);
+    Dx{i_dim} = spdiags([-ones_vec,2*ones_vec,-ones_vec], [-1 0 1], dim_X(i_dim),dim_X(i_dim));
     switch BC
         case '0'
             % nothing to be corrected
         case 'NB'
-            Dx{iDim}(1,1) = 1;
-            Dx{iDim}(end,end) = 1;
+            Dx{i_dim}(1,1) = 1;
+            Dx{i_dim}(end,end) = 1;
         otherwise
             notImpErr
     end
-    I{iDim} = speye(dimX(iDim));
+    I{i_dim} = speye(dim_X(i_dim));
 end
     
 % L can be constructed by tensor products of the single dim laplacians 
-switch length(dimX)
+switch length(dim_X)
     case 1
         L = Dx{1};
     case 2

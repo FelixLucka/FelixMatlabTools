@@ -1,4 +1,4 @@
-function [min_, max_] = minMax(p)
+function [min_p, max_p] = minMax(p)
 % MYMINMAX returns minimal and maximal value of given data
 %
 % DESCRIPTION:
@@ -21,7 +21,7 @@ function [min_, max_] = minMax(p)
 %
 % See also min, max
 
-min_ = min(p(:));
-max_ = max(p(:));
+min_p = min(p(:));
+max_p = max(p(:));
 
 end

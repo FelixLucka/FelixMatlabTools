@@ -1,8 +1,8 @@
-function Str = upperFirst(str)
+function str = upperFirst(str)
 %UPPERFIRST is a wrapper for [upper(str(1)) str(2:end)]
 %
 % DESCRIPTION: 
-%   functionTemplate.m can be used to only capitalize the first char of a 
+%   upperFirst.m can be used to only capitalize the first char of a 
 %   string
 %
 % USAGE:
@@ -18,14 +18,14 @@ function Str = upperFirst(str)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 05.11.2018
-%       last update     - 05.11.2018
+%       last update     - 16.05.2023
 %
 % See also upper, lower
 
 if(isempty(str))
-    Str = '';
+    str = '';
 else
-    Str = [upper(str(1)) str(2:end)];
+    str = [upper(str(1)) str(2:end)];
 end
 
 end

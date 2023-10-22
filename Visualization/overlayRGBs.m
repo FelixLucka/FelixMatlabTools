@@ -17,7 +17,7 @@ function RGB12 = overlayRGBs(RGB1, RGB2, alpha1)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 05.11.2018
-%       last update     - 05.11.2018
+%       last update     - 14.10.2023
 %
 % See also rgbComposite
 

@@ -16,7 +16,7 @@ function printRGB(RGB, para)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 05.11.2018
-%       last update     - 05.11.2018
+%       last update     - 20.10.2032
 %
 % See also movieFromRGB
 
@@ -34,34 +34,34 @@ switch flip
         B = flipud(B);
 end
 
-printPixPerPix = checkSetInput(para, 'printPixPerPix', 'i,>0', [1 1]);
-if(~isequal(printPixPerPix, [1,1]))
-    R = IncImageRes(R, printPixPerPix);
-    G = IncImageRes(G, printPixPerPix);
-    B = IncImageRes(B, printPixPerPix);
+print_pix_per_pix = checkSetInput(para, 'printPixPerPix', 'i,>0', [1 1]);
+if(~isequal(print_pix_per_pix, [1,1]))
+    R = incImageRes(R, print_pix_per_pix);
+    G = incImageRes(G, print_pix_per_pix);
+    B = incImageRes(B, print_pix_per_pix);
 end
 
 % re-unite it to an RGB
 RGB = cat(3, R, G, B);
 
 
-fileName = checkSetInput(para,'fileName','char','dfRGBfile.png');
+file_name = checkSetInput(para,'fileName','char','dfRGBfile.png');
 % attach '.png' if it is missing.
-if(length(fileName) < 4 || ~strcmp(fileName(end-3:end),'.png'))
-    fileName = [fileName '.png'];
+if(length(file_name) < 4 || ~strcmp(file_name(end-3:end),'.png'))
+    file_name = [file_name '.png'];
 end
 
 % use imwrite to print it
-errorCount = 0;
+error_count = 0;
 while(1)
     try
-        imwrite(RGB, fileName,'png','bitdepth',8)
+        imwrite(RGB, file_name,'png','bitdepth',8)
         break
     catch ME
-        if (errorCount == 10 || ~strcmp(ME.identifier,'MATLAB:imagesci:png:libraryFailure'))
+        if (error_count == 10 || ~strcmp(ME.identifier,'MATLAB:imagesci:png:libraryFailure'))
             rethrow(ME)
         else
-            errorCount = errorCount + 1;
+            error_count = error_count + 1;
             pause(0.1)
         end
     end

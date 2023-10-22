@@ -1,4 +1,4 @@
-function [plotH, axisH, figureH] = conePlot(XYZ, UVW, para)
+function [plot_h, axis_h, figure_h] = conePlot(xyz, uvw, para)
 %CONEPLOT is an adaptation of coneplot that can handle more general
 %inputs
 %
@@ -6,23 +6,27 @@ function [plotH, axisH, figureH] = conePlot(XYZ, UVW, para)
 %   conePlot(randn(100,3), randn(100,3), [])
 %
 % INPUTS:
-%   XYZ - n x 3 list of starting points of the cones
-%   UVW - n x 3 list of vectors indicating direction and lenght of cones
+%   xyz - n x 3 list of starting points of the cones
+%   uvw - n x 3 list of vectors indicating direction and lenght of cones
 %
 % OPTIONAL INPUTS:
 %   para - a struct containing further optional parameters:
 %       'axisHandle'- A handle to existing axes in which the plot should be
 %                     placed.
+%       'coneRes' - an integer determining the resolution of the
+%       triangulation patch used to reder the sphere (default: 20)
+%       'scaling'   - relative scaling (default: 1)
+%       'color'     - RGB value determining the color of the spheres
 %
 %  OUTPUTS:
-%   plotH	 - hande to the different plots
-%   axisH    - handle to the axis
-%   figureH  - handle to the figure
+%   plot_h	 - hande to the different plots
+%   axis_h    - handle to the axis
+%   figure_h  - handle to the figure
 %
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 03.12.2018
-%       last update     - 03.12.2018
+%       last update     - 20.04.2023
 %
 % See also spherePlot, surfPlot
 
@@ -33,46 +37,46 @@ end
 
 
 % create new axis
-[axisH,dfFL] = checkSetInput(para, 'axisHandle', 'mixed', 1);
-if(dfFL)
-    [axisH, figureH] = createAxis(para);
+[axis_h, df] = checkSetInput(para, 'axisHandle', 'mixed', 1);
+if(df)
+    [axis_h, figure_h] = createAxis(para);
 end
-hold(axisH, 'on')
+hold(axis_h, 'on')
 
-coneRes = checkSetInput(para, 'coneRes', 'i,>0', 20);
+cone_res = checkSetInput(para, 'coneRes', 'i,>0', 20);
 scaling = checkSetInput(para, 'scaling', '>0', 1);
 color   = checkSetInput(para, 'color', 'double', [1 0 0]);
 
-vecNorms    = sqrt(sum(UVW.^2, 2));
-maxVecNorms = max(vecNorms);    
+vec_norms     = sqrt(sum(uvw.^2, 2));
+max_vec_norms = max(vec_norms);
 
 conewidth = .333;
 
-[faces, verts] = conegeom(coneRes);
-nCones         = size(UVW, 1);
+[faces, verts] = conegeom(cone_res);
+n_cones        = size(uvw, 1);
 flen           = size(faces, 1);
-nVerts         = size(verts, 1);
-faces          = repmat(faces, nCones, 1);
-verts          = repmat(verts, nCones, 1);
-offset         = floor((0:flen*nCones-1) / flen)';
-faces          = faces + repmat(nVerts*offset, 1, 3);
+n_verts        = size(verts, 1);
+faces          = repmat(faces, n_cones, 1);
+verts          = repmat(verts, n_cones, 1);
+offset         = floor((0:flen*n_cones-1) / flen)';
+faces          = faces + repmat(n_verts*offset, 1, 3);
 
-for iCone = 1:nCones
-    index             = (iCone-1)*nVerts+1:iCone*nVerts;
-    lenCone           = scaling * 1/maxVecNorms * vecNorms(iCone);
-    verts(index, 3)   = verts(index,3) * lenCone;
-    verts(index, 1:2) = verts(index,1:2) * lenCone*conewidth;
-    verts(index, :)   = coneorient(verts(index,:),    UVW(iCone,:));
-    verts(index, :)   = bsxfun(@plus, verts(index,:), XYZ(iCone,:));
+for iCone = 1:n_cones
+    index             = (iCone-1)*n_verts+1:iCone*n_verts;
+    len_cone          = scaling * 1/max_vec_norms * vec_norms(iCone);
+    verts(index, 3)   = verts(index,3) * len_cone;
+    verts(index, 1:2) = verts(index,1:2) * len_cone*conewidth;
+    verts(index, :)   = coneorient(verts(index,:),    uvw(iCone,:));
+    verts(index, :)   = bsxfun(@plus, verts(index,:), xyz(iCone,:));
 end
 
-plotH = patch('Parent', axisH, 'faces', faces, 'vertices', verts, ...
-              'LineStyle', 'none', 'FaceColor', color);
+plot_h = patch('Parent', axis_h, 'faces', faces, 'vertices', verts, ...
+    'LineStyle', 'none', 'FaceColor', color);
 
-% add light and fix view point          
-lightAndView(axisH, para)
+% add light and fix view point
+lightAndView(axis_h, para)
 
-%%% the following lines of code are unmodified from Matlab's own coneplot.m          
+%%% the following lines of code are unmodified from Matlab's own coneplot.m
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -80,8 +84,8 @@ lightAndView(axisH, para)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [f, v] = conegeom(coneRes)
 
-cr = coneRes;
-[xx, yy, zz]=cylinder([.5 0], cr);
+cr           = coneRes;
+[xx, yy, zz] = cylinder([.5 0], cr);
 f = zeros(cr*2-2,3);
 v = zeros(cr*3,3);
 v(1     :cr  ,:) = [xx(2,1:end-1)' yy(2,1:end-1)' zz(2,1:end-1)'];

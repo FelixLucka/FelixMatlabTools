@@ -1,4 +1,4 @@
-function newIm = decImageRes(im, fac, average)
+function im_new = decImageRes(im, fac, average)
 %DECIMAGERES decreases the resolution of an image by summing or averaging pixels
 %
 % DESCRIPTION:
@@ -19,7 +19,7 @@ function newIm = decImageRes(im, fac, average)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 17.06.2020
-%       last update     - 17.06.2020
+%       last update     - 05.09.2023
 %
 % See also scaleImage
 
@@ -32,21 +32,21 @@ if(~ (isequal(mod(fac,1),[0,0])))
     error('res must be of format [i,j] with i and j being the integer factor by which the resolution should be increased')
 end
 
-newIm = im(1:fac(1):end, :);
+im_new = im(1:fac(1):end, :);
 for i=2:fac(1)
-    newIm = newIm + im(i:fac(1):end, :);
+    im_new = im_new + im(i:fac(1):end, :);
 end
 if(average)
-    newIm = newIm / fac(1);
+    im_new = im_new / fac(1);
 end
-im = newIm;
+im = im_new;
 
-newIm = im(:,1:fac(2):end);
+im_new = im(:,1:fac(2):end);
 for j=2:fac(2)
-    newIm = newIm + im(:, j:fac(2):end);
+    im_new = im_new + im(:, j:fac(2):end);
 end
 if(average)
-    newIm = newIm / fac(2);
+    im_new = im_new / fac(2);
 end
 
 end

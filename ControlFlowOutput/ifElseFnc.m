@@ -19,7 +19,7 @@ function x = ifElseFnc(a, b, c)
 %       date            - 23.04.2020
 %       last update     - 23.04.2020
 %
-% See also
+% See also ifElseFncHndl
 
 if(a)
     x = b;

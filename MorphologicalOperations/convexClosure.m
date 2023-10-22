@@ -19,19 +19,19 @@ function im = convexClosure(im)
 % ABOUT:
 %   author          - Felix Lucka
 %   date            - 08.04.2017
-%   last update     - 08.04.2017
+%   last update     - 13.10.2023
 %
 % See also convexHull
 
-sizeIm = size(im);
+sz_im = size(im);
 
 % construct cooridinates of pixel/voxel grid
 switch ndims(im)
     case 2
-        [X, Y] = ndgrid(1:sizeIm(1), 1:sizeIm(2));
+        [X, Y] = ndgrid(1:sz_im(1), 1:sz_im(2));
         XYZ    = [X(:), Y(:)];
     case 3
-        [X, Y, Z] = ndgrid(1:sizeIm(1), 1:sizeIm(2), 1:sizeIm(2));
+        [X, Y, Z] = ndgrid(1:sz_im(1), 1:sz_im(2), 1:sz_im(3));
         XYZ    = [X(:), Y(:), Z(:)];
 end
 
@@ -50,6 +50,6 @@ warning('on', 'MATLAB:delaunayTriangulation:DupPtsWarnId')
 % this returns nan if points are outside the convex hull
 im = pointLocation(DT, XYZ);
 % detect non-nan locations and reshape to image 
-im = reshape(not(isnan(im)), sizeIm);
+im = reshape(not(isnan(im)), sz_im);
 
 end

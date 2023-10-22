@@ -21,7 +21,7 @@ function x = functionTemplate(y, z, para)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 19.12.2018
-%       last update     - 19.12.2018
+%       last update     - 29.09.2023
 %
 % See also
 
@@ -34,7 +34,5 @@ end
 if(nargin < 3)
     para = [];
 end
-
-
 
 end

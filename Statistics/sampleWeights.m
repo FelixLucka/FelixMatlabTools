@@ -1,4 +1,4 @@
-function i = sampleWeights(w)
+function ind = sampleWeights(w, size)
 %SAMPLEWEIGHTS samples a given, unnormalized distribution of weights
 %
 % DESCRIPTION: 
@@ -7,10 +7,13 @@ function i = sampleWeights(w)
 %   returning i is p(i) = w(i)/sum(w)
 %
 % USAGE:
-%   i = sampleWeights(w)
+%   i = sampleWeights(w, [2,3])
 %
 % INPUTS:
 %   w - vector of non-negative weights
+%
+% OPTIONAL INPUTS
+%   size - size of the random samples (default = [1,1])
 %
 % OUTPUTS:
 %   i - index of sampled weight
@@ -22,6 +25,11 @@ function i = sampleWeights(w)
 %
 % See also
 
+% check user defined value for z, otherwise assign default value
+if(nargin < 2)
+    size = [1,1];
+end
+
 if(any(w < 0))
    error('weight vector w must be non-negative!') 
 end
@@ -30,11 +38,10 @@ end
 w = w/sum(w);
 w = cumsum(w);
 
-t = rand();
-i = find(t < w, 1, 'first');
-
-if(isempty(i))
-    i = 1;
+t   = rand(size);
+ind = ones(size);
+for i=1:numel(t)
+    ind(i) = find(t(i) < w, 1, 'first');
 end
 
 end

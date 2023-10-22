@@ -1,4 +1,4 @@
-function xPro = firstNonZero(x, dim)
+function x_pro = firstNonZero(x, dim)
 %FIRSTNONZERO     projects an n-dim array onto the first non zero value
 %along a specified dimension
 %
@@ -21,14 +21,14 @@ function xPro = firstNonZero(x, dim)
 %
 % ABOUT:
 %       author          - Felix Lucka
-%       date            - 27th February 2017
-%       last update     - 27th February 2017
+%       date            - 27.02.2017
+%       last update     - 24.09.2023
 %
 % See also min, max, sum, cumsum
 
 % a simple implementation making use of matlabs build-in functions
-xPro               = cumsum(x, dim);
-xPro(xPro == 0)    = NaN;
-xPro               = squeeze(min(xPro, [], dim));
-xPro(isnan(xPro))  = 0;
+x_pro               = cumsum(x, dim);
+x_pro(x_pro == 0)    = NaN;
+x_pro               = squeeze(min(x_pro, [], dim));
+x_pro(isnan(x_pro))  = 0;
 

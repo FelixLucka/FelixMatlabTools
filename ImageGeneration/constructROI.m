@@ -1,4 +1,4 @@
-function [ROI, roiID] = constructROI(grid, para)
+function [roi, roi_id] = constructROI(grid, para)
 %CONSTRUCTROI constructs a region of interest
 %
 % DESCRIPTION: 
@@ -24,7 +24,7 @@ function [ROI, roiID] = constructROI(grid, para)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 01.11.2018
-%       last update     - 01.11.2018
+%       last update     - 29.09.2023
 %
 % See also embedROI
 
@@ -40,8 +40,8 @@ switch type
         abc = checkSetInput(para,'abc', 'numeric', 'error');
         d   = checkSetInput(para, 'd', 'numeric', 'error');
         
-        ROI = abc(1) * grid.x + abc(2) * grid.y + abc(3) * grid.z >= d;
-        roiID = ['HPa' num2str(abs(1),'%.2e') 'b' num2str(abs(2),'%.2e') ...
+        roi = abc(1) * grid.x + abc(2) * grid.y + abc(3) * grid.z >= d;
+        roi_id = ['HPa' num2str(abs(1),'%.2e') 'b' num2str(abs(2),'%.2e') ...
                 'c' num2str(abs(3),'%.2e') 'd' num2str(d,'%.2e')];
     
     case 'cylinder'
@@ -64,15 +64,15 @@ switch type
         % compute projection of all grid points onto direction vector
         projection = X * direction(1) + Y * direction(2) + Z * direction(3);
         % subtract projection to obtain radial vector component
-        radialPartX = X - projection * direction(1);
-        radialPartY = Y - projection * direction(2);
-        radialPartZ = Z - projection * direction(3);
+        radial_part_X = X - projection * direction(1);
+        radial_part_Y = Y - projection * direction(2);
+        radial_part_Z = Z - projection * direction(3);
         % compute radial vector length
-        radialDist = radialPartX.^2 + radialPartY.^2 + radialPartZ.^2;
+        radial_dist = radial_part_X.^2 + radial_part_Y.^2 + radial_part_Z.^2;
         
         % create ROI 
-        ROI = radialDist < radius^2;
-        roiID = 'Cy';
+        roi = radial_dist < radius^2;
+        roi_id = 'Cy';
 end
     
 

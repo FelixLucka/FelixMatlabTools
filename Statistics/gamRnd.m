@@ -1,4 +1,4 @@
-function gam = gamRnd(alpha,beta)
+function gam = gamRnd(alpha, beta)
 %GAMRND samples from a gamma distribution by the method of
 % Marsaglia and Tsang, 2000
 %
@@ -25,7 +25,7 @@ function gam = gamRnd(alpha,beta)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 05.11.2018
-%       last update     - 05.11.2018
+%       last update     - 16.05.2023
 %
 % See also gamrnd
 
@@ -43,7 +43,7 @@ beta  = beta(:);
 alpha(alpha < 0) = NaN;
 beta(beta < 0)   = NaN;
 
-isNotReady = find(not(isnan(alpha) | isnan(beta)));
+is_not_ready = find(not(isnan(alpha) | isnan(beta)));
 
 % shift alpha by +1 if needed
 if(any(alpha < 1))
@@ -61,8 +61,8 @@ d = alpha - 1/3;
 c = 1./sqrt(9*d);
 
 
-while(~isempty(isNotReady))
-    n_nr = length(isNotReady);
+while(~isempty(is_not_ready))
+    n_nr = length(is_not_ready);
     x =  randn(n_nr,1);
     x2 = x.*x;
     U =  rand(n_nr,1);
@@ -71,7 +71,7 @@ while(~isempty(isNotReady))
     
     use1 = v > 0 & U < (1 - 0.0331 * (x2.*x2));
     
-    gam(isNotReady(use1)) = d(use1) .* v(use1);
+    gam(is_not_ready(use1)) = d(use1) .* v(use1);
     nuse1 = ~use1;
     x = x(nuse1);
     x2 = x2(nuse1);
@@ -79,15 +79,15 @@ while(~isempty(isNotReady))
     v = v(nuse1);
     d = d(nuse1);
     c = c(nuse1);
-    isNotReady = isNotReady(nuse1);
+    is_not_ready = is_not_ready(nuse1);
     
     use2  = v > 0 & (log(U) < 0.5 * x2 + d.*(1-v+log(v)));
     
-    gam(isNotReady(use2)) = d(use2) .* v(use2);
+    gam(is_not_ready(use2)) = d(use2) .* v(use2);
     nuse2 = ~use2;
     c = c(nuse2);
     d = d(nuse2);
-    isNotReady = isNotReady(nuse2);
+    is_not_ready = is_not_ready(nuse2);
 end
 
 % reshift if needed

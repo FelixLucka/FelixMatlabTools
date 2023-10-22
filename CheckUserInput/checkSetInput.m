@@ -5,7 +5,7 @@ function [paraValue, useDefault, para, msgID, msg] = checkSetInput(para, fieldNa
 %  DESCRIPTION:
 %       Checks if a field value of a struct fulfills certain conditions.
 %       Meant to be used to check inputs to a function that are summarized
-%       in a struct. If no value is given, it assigns a default_value or 
+%       in a struct. If no value is given, it assigns a default_value or
 %       promts the user to choose a value.
 %       It can also be used to directly check variables.
 %
@@ -49,18 +49,18 @@ function [paraValue, useDefault, para, msgID, msg] = checkSetInput(para, fieldNa
 %                        checked for!
 %       errorHandling  - if 'error' (default) : an error will be thrown if the field
 %                        is assigned wrong
-%                        'default': the default value is returned 
-%                        'promt' : the user is promted to enter the value 
+%                        'default': the default value is returned
+%                        'promt' : the user is promted to enter the value
 %                        if the field is not assigned
 %
 % OPTIONAL INPUTS:
-%       rmField - a logical indicating whether the field should be removed 
+%       rmField - a logical indicating whether the field should be removed
 %                 from the para struct
 %
 %  OUTPUTS:
 %       paraValue      - the checked parameter value
 %       useDefault     - a logical indicating whether the default value
-%                         was assigned 
+%                         was assigned
 %       para           - the modified para struct (possibly with the field
 %                         fieldname removed)
 %       'errorID'
@@ -79,15 +79,15 @@ isParaField = isfield(para, fieldName);
 
 % check user defined value for info, otherwise assign default value
 if(nargin < 6)
-    rmField = false;   
+    rmField = false;
 end
 
 % check user defined value for errorPromt_Fl, otherwise assign default value
 if(nargin < 5 || isempty(errorHandling))
     if(isParaField)
-        errorHandling = 'error'; 
+        errorHandling = 'error';
     else
-        errorHandling = 'default';   
+        errorHandling = 'default';
     end
 end
 
@@ -95,7 +95,7 @@ end
 % struct
 if(isempty(fieldName))
     
-    % call checkSetInput recursively 
+    % call checkSetInput recursively
     testPara.test      = para;
     [paraValue, useDefault, ~, msgID, msg] = checkSetInput(testPara, 'test',...
         possibleValues, defaultValue, 'error');
@@ -112,13 +112,13 @@ if(isParaField)
     %%% main loop, check all possible input classes
     switch class(possibleValues)
         
-        case 'cell' 
+        case 'cell'
             
             % choose one of many possible inputs
             if(not(iscellstr(possibleValues)))
                 
                 msg   = 'Invalid specification of possible values: It is a cell, but not cell array of strings';
-            % check if input matches any possible values
+                % check if input matches any possible values
             elseif(any(strcmp(para.(fieldName), possibleValues)))
                 % assign chosen value
                 assign = true;
@@ -133,9 +133,9 @@ if(isParaField)
                     ', choose one of the following: ' possibleValuesStr];
             end
             
-        case 'double' 
+        case 'double'
             
-            % input must be one of the doubles specified  
+            % input must be one of the doubles specified
             if(any(possibleValues == para.(fieldName)))
                 assign = true;
             else
@@ -146,7 +146,7 @@ if(isParaField)
         case 'char'
             
             % input must match the possible strings
-            if(strcmp(possibleValues,'inputFile')) 
+            if(strcmp(possibleValues,'inputFile'))
                 
                 % para.fieldname should be a file name
                 if(exist(para.(fieldName), 'file'))
@@ -164,7 +164,7 @@ if(isParaField)
                     msg = ['para.' fieldName ' is not an existing directory name'];
                 end
                 
-            elseif(strcmp(possibleValues,'mixed')) 
+            elseif(strcmp(possibleValues,'mixed'))
                 
                 % check nothing, just assign
                 assign = true;
@@ -218,7 +218,7 @@ if(isParaField)
                         msg = ['Invalid value for para.' fieldName ', it has to fulfill ' possibleValues];
                     end
                     
-                elseif(any([intGreatSmall intGreatSmallEqual])) 
+                elseif(any([intGreatSmall intGreatSmallEqual]))
                     
                     % upperbound/lowerbound constraint
                     
@@ -262,9 +262,9 @@ if(isParaField)
             msg = 'Invalid specification of possible values';
             
     end
-                    msgID = 'AssignError';
-
-   
+    msgID = 'AssignError';
+    
+    
     if(assign)
         
         % assign value
@@ -280,23 +280,23 @@ if(isParaField)
             case 'default'
                 % assign value anyways
                 paraValue = para.(fieldName);
-                useDefault = true;                
+                useDefault = true;
         end
     end
-
+    
     
 else % if(isfield(para, fieldName))
     
     
     switch errorHandling
-        case 'error' 
+        case 'error'
             
             % throw error
             msgID = 'FMT:AssignError';
             msg   = ['parametervalue ' fieldName ' has to be set!'];
             error(msgID, msg)
             
-        case 'promt' 
+        case 'promt'
             
             % promt user to give input
             command = ['Set value for parameter ''' fieldName];
@@ -329,9 +329,9 @@ end % if(isfield(para, fieldName))
 
 if(rmField)
     
-   % remove field to save memory 
-   para = removeFields(para, fieldName); 
-   
+    % remove field to save memory
+    para = removeFields(para, fieldName);
+    
 end
 
 end

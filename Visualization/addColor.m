@@ -1,4 +1,4 @@
-function newColor = addColor(colorTable, avoidColors, iter)
+function new_color = addColor(color_table, avoid_colors, iter)
 %ADDCOLOR tries to add a color to a table of colors that is as different as
 %possible to them (in terms of euklidean distance)
 %
@@ -22,27 +22,27 @@ function newColor = addColor(colorTable, avoidColors, iter)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 23.10.2017
-%       last update     - 23.10.2017
+%       last update     - 13.10.2023
 %
 % See also 
 
 % add colors to avoid and those in the table
-tempColorTable = [colorTable; avoidColors];
+tmp_color_table = [color_table; avoid_colors];
 
 % generate random colors
-proColors = rand(iter, 3);
-dist       = zeros(iter, size(tempColorTable, 1));
+pro_colors = rand(iter, 3);
+dist       = zeros(iter, size(tmp_color_table, 1));
 
-for iColor=1:size(tempColorTable,1)
+for i_color=1:size(tmp_color_table, 1)
     
     % compute distance to colors in the table 
-    dist(:,iColor) = sqrt(sum((bsxfun(@minus, proColors, ...
-                               tempColorTable(iColor, :))).^2,2));
+    dist(:,i_color) = sqrt(sum((bsxfun(@minus, pro_colors, ...
+                               tmp_color_table(i_color, :))).^2,2));
     
 end
 
 % return the one with the maximal distance
-[~, ind] = max(min(dist, [], 2));
-newColor = proColors(ind, :);
+[~, ind]  = max(min(dist, [], 2));
+new_color = pro_colors(ind, :);
 
 end

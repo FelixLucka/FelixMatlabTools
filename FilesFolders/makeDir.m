@@ -1,27 +1,27 @@
-function [dirStr, dirExist] = makeDir(dirStr, output)
+function [dir_str, dir_exist] = makeDir(dir_str, output)
 % MAKEDIR is a wrapper for mkdir. 
 %
 %  DESCRIPTION: makeDir tries to make a directory at the given path,
 % returns the path and a logical indicating whether the dir already existed 
 %
 %  USAGE:
-%       [dirPath, dirExistFL] = makeDir(['photos_' date])
+%       [dir_path, dir_exist] = makeDir(['photos_' date])
 %
 %  INPUTS:
-%       dirStr          - the path to the dir to create
+%       dir_str         - the path to the dir to create
 %       output          - a logical indicating whether output should be
 %                         displayed (default = true)
 %
 %  OUTPUTS:
-%       dirStr        - the path to the dir to create (useful if the
+%       dir_str        - the path to the dir to create (useful if the
 %                       function is called with a construction like in the USAGE section
-%       dirExist      - a logical indicating whether the dir already
+%       dir_exist      - a logical indicating whether the dir already
 %                       existed
 %
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 09.03.2018
-%       last update     - 09.03.2018
+%       last update     - 26.09.2023
 %
 % See also sizeOfDir
 
@@ -30,15 +30,15 @@ if(nargin < 2)
     output = true;
 end
 
-dirExist = exist(dirStr, 'dir');
+dir_exist = exist(dir_str, 'dir');
 
-if(not(dirExist))
+if(not(dir_exist))
     
     if(output)
-        disp(['Making directory: ' dirStr])
+        disp(['Making directory: ' dir_str])
     end
     
-    [status,message,messageid] = mkdir(dirStr);
+    [status,message,messageid] = mkdir(dir_str);
     
     if(not(status))
         warning(messageid,message)

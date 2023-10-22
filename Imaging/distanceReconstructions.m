@@ -44,7 +44,7 @@ function [dist, thresholds] = distanceReconstructions(im1, im2, para)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 01.11.2018
-%       last update     - 01.11.2018
+%       last update     - 29.09.2023
 %
 % See also norm
 
@@ -64,21 +64,21 @@ if(~ iscell(im1))
         im2 = im2/norm(im2(:),normalizationNorm);
     end
     
-    maxVal = max([im1(:);im2(:)]);
+    max_val = max([im1(:);im2(:)]);
     
-    errorMeasures = checkSetInput(para,'errorMeasures', 'cell', {'MSE'});
+    error_measures = checkSetInput(para,'errorMeasures', 'cell', {'MSE'});
     thresholds    = checkSetInput(para,'thresholds','>=0',0:0.1:0.9);
-    dist = cell(1,length(errorMeasures));
+    dist = cell(1,length(error_measures));
     
     for i=1:length(thresholds)
-        threshold = maxVal * thresholds(i);
+        threshold = max_val * thresholds(i);
         im1_thres = im1;
         im1_thres(im1 < threshold) = 0;
         im2_thres = im2;
         im2_thres(im2 < threshold) = 0;
         
-        for j=1:length(errorMeasures)
-            switch errorMeasures{j}
+        for j=1:length(error_measures)
+            switch error_measures{j}
                 case 'MSE' % mean squared error MSE
                     dist{j}.name = 'MSE';
                     dist{j}.value(i) = sum((im1_thres(:)-im2_thres(:)).^2)/numel(im1_thres(:));
@@ -116,7 +116,7 @@ if(~ iscell(im1))
                     dist{j}.name     = 'SSIM';
                     dist{j}.value(i) = ssim(im1_thres,im2_thres);
                 otherwise
-                    error(['unkown error measure: ' errorMeasures{j}])
+                    error(['unkown error measure: ' error_measures{j}])
             end
         end
         
@@ -125,21 +125,21 @@ else
     % compute error measures frame-by-frame
     T = length(im1);
     for t=1:T
-        [distAll{t}, thresholdsAll{t}] = distanceReconstructions(im1{t},im2{t},para);
+        [dist_all{t}, thresholds_all{t}] = distanceReconstructions(im1{t},im2{t},para);
     end
     
     % accumulate error
-    dist  = distAll{1};
+    dist  = dist_all{1};
     for iErr = 1:length(dist)
         for t=1:T
-            dist{iErr}.value(t) = distAll{t}{iErr}.value;
+            dist{iErr}.value(t) = dist_all{t}{iErr}.value;
         end
     end
     
     
     % reduce to statistics
-    dynamicMode = checkSetInput(para,'dynamicMode',{'mean','meanMinMax','all'},'mean');
-    switch dynamicMode
+    dynamic_mode = checkSetInput(para,'dynamicMode',{'mean','meanMinMax','all'},'mean');
+    switch dynamic_mode
         case 'mean'
             for iErr = 1:length(dist)
                 dist{iErr}.value = mean(dist{iErr}.value);

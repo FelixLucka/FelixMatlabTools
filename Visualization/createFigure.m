@@ -1,8 +1,5 @@
-function [figH, show] = createFigure(para)
+function [fig_h, show] = createFigure(para)
 % CREATEFIGURE creates a new figure object.
-%
-% DESCRIPTION:
-%   TODO
 %
 % USAGE:
 %  axis_handle = createAxis(para)
@@ -10,45 +7,45 @@ function [figH, show] = createFigure(para)
 %
 %  INPUTS:
 %   para        - a struct that subsums all optional parameters
-%       'showFL'        -  a logical indicating whether the figure is visible
-%       'dockedFL'      -  a logical indicating whether the figure is
+%       'show'        -  a logical indicating whether the figure is visible
+%       'docked'      -  a logical indicating whether the figure is
 %                          docked
-%       'fullscreenFL'  -  a logical indicating whether the figure is full
+%       'fullscreen'  -  a logical indicating whether the figure is full
 %                          screen
 %
 %  OUTPUTS:
-%   figH        - a handle to the figure created
-%   showFL      - a logical indicating whether the figure is visible
+%   fig_h      - a handle to the figure created
+%   show      - a logical indicating whether the figure is visible
 %
 % ABOUT:
 %   author          - Felix Lucka
 %   date            - 13.12.2017
-%   last update     - 13.12.2017
+%   last update     - 20.04.2023
 %
 % See also createAxis, assignOrCreateFigureHandle
 
 
 show          = checkSetInput(para, 'show', 'logical', true);
 docked        = checkSetInput(para, 'docked', 'logical', false);
-fullScreen    = checkSetInput(para, 'fullScreen', 'logical', false);
+full_screen   = checkSetInput(para, 'fullScreen', 'logical', false);
 
 if(show)
-    if(fullScreen)
-        fullScreen = get(0, 'ScreenSize');
-        figH = figure('Position', [0 -50 fullScreen(3) fullScreen(4)], 'PaperSize', [40 60]);
+    if(full_screen)
+        full_screen = get(0, 'ScreenSize');
+        fig_h = figure('Position', [0 -50 full_screen(3) full_screen(4)], 'PaperSize', [40 60]);
     else
-        figH = figure();
+        fig_h = figure();
     end
 else
-    if(fullScreen)
-        figH = figure('Position', [0 -50 1680 1050], 'PaperSize', [40 60], 'Visible', 'off');
+    if(full_screen)
+        fig_h = figure('Position', [0 -50 1680 1050], 'PaperSize', [40 60], 'Visible', 'off');
     else
-        figH = figure('Visible', 'off');
+        fig_h = figure('Visible', 'off');
     end
 end
 
 if(docked)
-    set(figH, 'WindowStyle', 'docked')
+    set(fig_h, 'WindowStyle', 'docked')
 end
 
 

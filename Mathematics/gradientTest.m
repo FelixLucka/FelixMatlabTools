@@ -1,17 +1,18 @@
-function results = gradientTest(FGrad, x, para)
-%GRADIENTTEST is a function to compare a function to compute a gradient
-%with a finite difference approximation of it
+function results = gradientTest(fgrad, x, para)
+%GRADIENTTEST COMPARES A FUNCTION TO COMPUTE A GRADIENT WITH A FINITE
+%DIFFERENCE APPROXIMATION OF IT
 %
 % DETAILS: 
-%   ToDo
+%   gradientTest.m can be used to see if numerial approximatios of
+%   gradients are valid 
 %
 % USAGE:
-%   results = gradientTest(FGrad, x, para)
+%   results = gradientTest(fgrad, x, para)
 %
 % INPUTS:
-%   FGrad  - function handle that returns objective function and gradient
+%   fgrad  - function handle that returns objective function and gradient
 %            if called as 
-%            [F(x), gradF(x)] = FGrad(x)
+%            [F(x), gradF(x)] = fgrad(x)
 %       x - point at which to evaluate gradient
 %
 % OPTIONAL INPUTS:
@@ -20,12 +21,12 @@ function results = gradientTest(FGrad, x, para)
 %       'delta' - step in finite difference computations
 %
 % OUTPUTS:
-%   result - a struct summarizing the results
+%   results - a struct summarizing the results
 %
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 28.09.2019
-%       last update     - 28.09.2019
+%       last update     - 21.10.2023
 %
 % See also
 
@@ -35,27 +36,27 @@ if(nargin < 3)
     para = [];
 end
 
-mode     = checkSetInput(para, 'mode', {'full'}, 'full');
-deltaDF  = max(abs(x(:))) * 10^-6;
-delta    = checkSetInput(para, 'delta', '>0', deltaDF);
+mode      = checkSetInput(para, 'mode', {'full'}, 'full');
+delta_df  = max(abs(x(:))) * 10^-6;
+delta     = checkSetInput(para, 'delta', '>0', delta_df);
 
 
 switch mode
     case 'full'
-        [Fx, gradFun] = FGrad(x);
-        gradFd        = zeros(size(x), 'like', x);
+        [fx, grad_fun] = fgrad(x);
+        grad_fd        = zeros(size(x), 'like', x);
         for i=1:numel(x)
-           xDelta    = x;
-           xDelta(i) = x(i) + delta;
-           FxDelta   = FGrad(xDelta);
-           gradFd(i) = (FxDelta - Fx) / delta;
+           x_delta    = x;
+           x_delta(i) = x(i) + delta;
+           fx_delta   = fgrad(x_delta);
+           grad_fd(i) = (fx_delta - fx) / delta;
         end
 end
 
-results.gradFun    = gradFun;
-results.gradFd     = gradFd;
-results.relL2Error   = norm(gradFun(:) - gradFd(:)) / (0.5 * (norm(gradFun(:)) + norm(gradFd(:))));
-results.relLInfError = norm(gradFun(:) - gradFd(:),'inf') / norm([gradFun(:),gradFd(:)],'inf');
+results.grad_fun     = grad_fun;
+results.grad_fd      = grad_fd;
+results.rel_l2_err   = norm(grad_fun(:) - grad_fd(:)) / (0.5 * (norm(grad_fun(:)) + norm(grad_fd(:))));
+results.rel_linf_err = norm(grad_fun(:) - grad_fd(:),'inf') / norm([grad_fun(:),grad_fd(:)],'inf');
 results.delta        = delta;
 
 end

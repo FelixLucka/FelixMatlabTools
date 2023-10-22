@@ -1,10 +1,32 @@
-function [results, text] = meshStatistics(nodes, elements,disp_flag)
+function [results, text] = meshStatistics(nodes, elements, disp_flag)
+%MESHSTATISTICS COMPUTES ELEMENTARY STATISTICS OF A MESH
+%
+% DETAILS: 
+%   meshStatistics.m computes elemenatry mesh statistics
+%
+% USAGE:
+%   [results, text] = meshStatistics(nodes, elements, disp_flag)
+%
+% INPUTS:
+%   nodes    - n_nodes x 3 array of mesh nodes
+%   elements - elements of mesh one as n_elements x 4 array of indices
+%       in range [1,...,n_nodes]
+%
+% OUTPUTS:
+%   results - struct containing all values
+%   text - string array containg a text to display
+%
+% ABOUT:
+%       author          - Felix Lucka
+%       date            - ??.??.????
+%       last update     - 27.09.2023
+%
+% See also
 
-
-N_nodes = size(nodes,1);
-N_elements = size(elements,1);
-results.N_nodes = N_nodes;
-results.N_elements = N_elements;
+n_nodes = size(nodes,1);
+n_elements = size(elements,1);
+results.n_nodes = n_nodes;
+results.n_elements = n_elements;
 
 e12 = (nodes(elements(:,2),:)) - (nodes(elements(:,1),:));
 e13 = (nodes(elements(:,3),:)) - (nodes(elements(:,1),:));
@@ -18,8 +40,7 @@ norm_e14 = sqrt(sum(e14.^2,2));
 norm_e23 = sqrt(sum(e23.^2,2));
 norm_e24 = sqrt(sum(e24.^2,2));
 norm_e34 = sqrt(sum(e34.^2,2));
-edge_length = [norm_e12,norm_e13,norm_e14,...
-        norm_e23,norm_e24,norm_e34];
+edge_length = [norm_e12,norm_e13,norm_e14, norm_e23,norm_e24,norm_e34];
 shortest_edge = min(edge_length,[],2);
 %longest_edge = max(edge_length,[],2);
 clear norm_e23 norm_e24 norm_e24 edge_length
@@ -48,8 +69,8 @@ nZeroVol = nnz(volume == 0);
 volume(volume == 0) = [];
 
 text = [{'Mesh statistics:'};
-    {['Number of nodes   : ' sprintf('%10i',N_nodes)]};
-    {['Number of elements: ' sprintf('%10i',N_elements)]};
+    {['Number of nodes   : ' sprintf('%10i',n_nodes)]};
+    {['Number of elements: ' sprintf('%10i',n_elements)]};
     {'Volume statistics:'};
     {['Zero volume: ' int2str(nZeroVol) ' | Smallest volume:   ' num2str(min(volume)) ' |  Largest volume:   ' num2str(max(volume))];
     'Volume histogram:'};
@@ -79,7 +100,6 @@ end
 text = [text;{[num2str(re_hist_edges(end),'%.1f') ' < rer      ' ...
     ' : ' sprintf('%10i',re_hist(end))]}];
 
-
 % text = [text;{['Smallest aspect_ratio: ' num2str(min(results.aspect_ratio))...
 %     '| Largest aspect_ratio: ' num2str(max(results.aspect_ratio))]};
 %     {'aspect_ratio histogram:'}];
@@ -93,9 +113,6 @@ text = [text;{[num2str(re_hist_edges(end),'%.1f') ' < rer      ' ...
 % end
 % text = [text;{[num2str(ar_hist_edges(end),'%4.1f') ' < vol ' ...
 %     ' : ' num2str(ar_hist(end))]}];
-
-
-
 
 if(disp_flag)
     for i=1:length(text)

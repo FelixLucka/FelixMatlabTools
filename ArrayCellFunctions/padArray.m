@@ -1,15 +1,15 @@
-function Apad = padArray(A, sizePad, v, side)
+function A_pad = padArray(A, sz_pad, v, side)
 %MYPADARRAY is a simpler reimplementation of padarray.m
 %
 % DESCRIPTION:
 %   padArray.m can can be used instead of padarray.m
 %
 % USAGE:
-%   Apad = padArray(phantom(100), [14, 14], 0, 'both')
+%   A_pad = padArray(phantom(100), [14, 14], 0, 'both')
 %
 % INPUTS:
 %   A       - 1, 2, or 3D numerical array to pad
-%   sizePad - number of slices to attach in each direction
+%   sz_pad - number of slices to attach in each direction
 %
 % OPTIONAL INPUTS:
 %   v    - value of the padded columns and rows (default: 0)
@@ -17,12 +17,12 @@ function Apad = padArray(A, sizePad, v, side)
 %          and rows should be attached
 %
 % OUTPUTS:
-%   Apad - padded array
+%   A_pad - padded array
 %
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 31.10.2018
-%       last update     - 18.12.2018
+%       last update     - 24.09.2023
 %
 % See also cutArray
 
@@ -36,51 +36,51 @@ if(nargin < 4)
     side = 'both';
 end
 
-dimA  = nDims(A);
-sizeA = size(A);
+dim_A = nDims(A);
+sz_A  = size(A);
 
 switch side
     case {'pre','post'}
-        szApad = sizeA + sizePad;
+        sz_A_pad = sz_A + sz_pad;
     case 'both'
-        szApad = sizeA + 2 * sizePad;
+        sz_A_pad = sz_A + 2 * sz_pad;
     otherwise
         error('unkown pad side, choose ''pre'', ''post'' or ''both''.')
 end
 
-Apad = v * ones(szApad, 'like', A);
+A_pad = v * ones(sz_A_pad, 'like', A);
 switch side
     case 'pre'
-        switch dimA
+        switch dim_A
             case 1
-                Apad((sizePad(1)+1):end) = A;
+                A_pad((sz_pad(1)+1):end) = A;
             case 2
-                Apad((sizePad(1)+1):end, (sizePad(2)+1):end) = A;
+                A_pad((sz_pad(1)+1):end, (sz_pad(2)+1):end) = A;
             case 3
-                Apad((sizePad(1)+1):end, (sizePad(2)+1):end, (sizePad(3)+1):end) = A;
+                A_pad((sz_pad(1)+1):end, (sz_pad(2)+1):end, (sz_pad(3)+1):end) = A;
             otherwise
                 notImpErr
         end
     case 'post'
-        switch dimA
+        switch dim_A
             case 1
-                Apad(1:(end-sizePad(1))) = A;
+                A_pad(1:(end-sz_pad(1))) = A;
             case 2
-                Apad(1:(end-sizePad(1)), 1:(end-sizePad(2))) = A;
+                A_pad(1:(end-sz_pad(1)), 1:(end-sz_pad(2))) = A;
             case 3
-                Apad(1:(end-sizePad(1)), 1:(end-sizePad(2)), 1:(end-sizePad(3))) = A;
+                A_pad(1:(end-sz_pad(1)), 1:(end-sz_pad(2)), 1:(end-sz_pad(3))) = A;
             otherwise
                 notImpErr
         end
     case 'both'
-        switch dimA
+        switch dim_A
             case 1
-                Apad((sizePad(1)+1):(end-sizePad(1))) = A;
+                A_pad((sz_pad(1)+1):(end-sz_pad(1))) = A;
             case 2
-                Apad((sizePad(1)+1):(end-sizePad(1)), (sizePad(2)+1):(end-sizePad(2))) = A;
+                A_pad((sz_pad(1)+1):(end-sz_pad(1)), (sz_pad(2)+1):(end-sz_pad(2))) = A;
             case 3
-                Apad((sizePad(1)+1):(end-sizePad(1)), ...
-                     (sizePad(2)+1):(end-sizePad(2)), (sizePad(3)+1):(end-sizePad(3))) = A;
+                A_pad((sz_pad(1)+1):(end-sz_pad(1)), ...
+                     (sz_pad(2)+1):(end-sz_pad(2)), (sz_pad(3)+1):(end-sz_pad(3))) = A;
             otherwise
                 notImpErr
         end

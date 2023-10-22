@@ -1,11 +1,11 @@
 function checkNaNInf(x)
-%FUNCTIONTEMPLATE is a template for a function describtion
+%CHECKNANINF throws an error if it encounters any NaNs or inf values
 %
 % DETAILS:
-%   functionTemplate.m can be used as a template
+%   checkNaNInf.m throws an error if it encounters any NaNs or inf values
 %
 % USAGE:
-%   x = functionTemplate(y)
+%   checkNaNInf([])
 %
 % INPUTS:
 %   y - bla bla
@@ -21,7 +21,7 @@ function checkNaNInf(x)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 04.12.2019
-%       last update     - 04.12.2019
+%       last update     - 16.05.2023
 %
 % See also
 

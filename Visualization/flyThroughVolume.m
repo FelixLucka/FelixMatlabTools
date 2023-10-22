@@ -1,4 +1,4 @@
-function [figureH, axesH, RGB] = flyThroughVolume(im, info, para)
+function [figure_h, axes_h, RGB] = flyThroughVolume(im, info, para)
 % FLYTHROUGHVOLUME plots a slice-by-slice movie of 3D volumes
 %
 % USAGE:
@@ -25,14 +25,14 @@ function [figureH, axesH, RGB] = flyThroughVolume(im, info, para)
 %       which the png files are printed
 %
 %  OUTPUTS:
-%   figureH - handle to the figure
-%   axesH   - handle to axes
-%   RGB     - the projections as a cell of RGB images
+%   figure_h - handle to the figure
+%   axes_h   - handle to axes
+%   RGB      - the projections as a cell of RGB images
 %
 % ABOUT:
 %   author          - Felix Lucka
 %   date            - 13.12.2017
-%   last update     - 07.12.2018
+%   last update     - 13.10.2023
 %
 % See also visualizeImage, slicePlot, maxIntensityProjection
 
@@ -49,22 +49,25 @@ end
 %%% read inputs and parameter
 fps           = checkSetInput(para, 'fps', '>0', 25);
 loop          = checkSetInput(para, 'loop', 'i,>0', 1);
-dimSlice      = checkSetInput(para, 'dimSlice', 'i,>0', 1);
-animatedGif   = checkSetInput(para, 'animatedGif', 'logical', false);
+dim_slice      = checkSetInput(para, 'dimSlice', 'i,>0', 1);
+if(length(dim_slice) > 1)
+    dim_slice = dim_slice(1);
+end
+animated_gif   = checkSetInput(para, 'animatedGif', 'logical', false);
 
 % slice information
-szIm         = size(im);
-dimNames     = {'X','Y','Z'};
-dimSliceName = dimNames{dimSlice};
-nSlice       = size(im, dimSlice);
+im_sz          = size(im);
+dim_names      = {'X','Y','Z'};
+dim_slice_name = dim_names{dim_slice};
+n_slice        = size(im, dim_slice);
 
-endSlice      = checkSetInput(para, 'endSlice', 'i,>0', round(nSlice/2));
-endSlice      = min(nSlice, endSlice);
+end_slice      = checkSetInput(para, 'endSlice', 'i,>0', round(n_slice/2));
+end_slice      = min(n_slice, end_slice);
 
 % get the full RGB
 RGB = data2RGB(im, para);
 clear im
-RGB = num2cell(RGB, setdiff(1:4, dimSlice));
+RGB = num2cell(RGB, setdiff(1:4, dim_slice));
 RGB = cellfun(@(x) squeeze(x), RGB, 'UniformOutput', false);
 
 %%% first we print the slices
@@ -72,14 +75,14 @@ print = checkSetInput(para, 'print', 'logical', false);
 if(print)
     printPara = [];
     
-    slices2print = checkSetInput(para, 'slices2print', 'i,>0', 1:szIm(dimSlice));
-    rootFilename = checkSetInput(para, 'fileName', 'char', 'volume');
-    rootFilename = strrep(rootFilename,'.png','');
+    slices2print = checkSetInput(para, 'slices2print', 'i,>0', 1:im_sz(dim_slice));
+    root_filename = checkSetInput(para, 'fileName', 'char', 'volume');
+    root_filename = strrep(root_filename,'.png','');
     
-    incRes4AnisoVoxel = checkSetInput(para, 'incRes4AnisoVoxel', 'logical', false);
-    if(incRes4AnisoVoxel)
+    inc_res_4_aniso_voxel = checkSetInput(para, 'incRes4AnisoVoxel', 'logical', false);
+    if(inc_res_4_aniso_voxel)
         enforceFields(info, 'info', {'dx', 'dy', 'dz'})
-        switch dimSlice
+        switch dim_slice
             case 1
                 printPara.printPixPerPix = round([info.dy,info.dz]/min(info.dy,info.dz));
             case 2
@@ -89,35 +92,35 @@ if(print)
         end
     end
     
-    trailingZeros = checkSetInput(para, 'trailingZeros', 'logical', false);
-    if(trailingZeros)
-        integerFormat = ['%0' int2str(1+floor(log10(nSlice))) 'd'];
+    trailing_zeros = checkSetInput(para, 'trailingZeros', 'logical', false);
+    if(trailing_zeros)
+        integerFormat = ['%0' int2str(1+floor(log10(n_slice))) 'd'];
     else
         integerFormat = '%d';
     end
     
     disp('print the chosen slices to png');
     for iSlice = slices2print
-        printPara.fileName = [rootFilename '_slice' dimSliceName ...
+        printPara.fileName = [root_filename '_slice' dim_slice_name ...
             sprintf(integerFormat, iSlice) '.png'];
         printRGB(RGB{iSlice}, printPara);
     end
     
     % overwrite endSlice
-    endSlice = slices2print(ceil(length(slices2print)/2));
+    end_slice = slices2print(ceil(length(slices2print)/2));
     
 end
 
 
 % generate animated gif before the images is shown
-if(animatedGif)
-    animationPara = para;
-    fileName = checkSetInput(animationPara,'fileName', 'char', [pwd '/volMovie']);
-    animationPara.fileName = strrep(fileName, '.gif', '');
-    animationPara.fps      = checkSetInput(animationPara, 'fpsMovie', 'double', fps);
+if(animated_gif)
+    animation_para = para;
+    filename = checkSetInput(animation_para,'fileName', 'char', [pwd '/volMovie']);
+    animation_para.fileName = strrep(filename, '.gif', '');
+    animation_para.fps      = checkSetInput(animation_para, 'fpsMovie', 'double', fps);
     
     % call movieFromRGB.m to do the conversion
-    movieFromRGB(RGB, animationPara);
+    movieFromRGB(RGB, animation_para);
 end
 
 
@@ -125,31 +128,31 @@ end
 %%% now show the movie
 try
     % create figure
-    figureH = assignOrCreateFigureHandle(para);
-    axesH   = axes('Parent',figureH, 'YTick', zeros(1,0), 'YDir', 'reverse', ...
+    figure_h = assignOrCreateFigureHandle(para);
+    axes_h   = axes('Parent',figure_h, 'YTick', zeros(1,0), 'YDir', 'reverse', ...
         'XTick', zeros(1,0), 'Layer', 'top', 'DataAspectRatio', [1 1 1]);
-    box(axesH,'on'); hold(axesH,'all');
-    image(RGB{1},'Parent',axesH);
-    ylim(axesH, [0.5, size(RGB{1},1)+0.5]);
-    xlim(axesH, [0.5, size(RGB{1},2)+0.5]);
-    imageHandleFly = get(axesH, 'Children');
+    box(axes_h,'on'); hold(axes_h,'all');
+    image(RGB{1},'Parent',axes_h);
+    ylim(axes_h, [0.5, size(RGB{1},1)+0.5]);
+    xlim(axes_h, [0.5, size(RGB{1},2)+0.5]);
+    imageHandleFly = get(axes_h, 'Children');
     
     %%% plotting, the try block will catch an error if the figure is closed
     %%% before the visulization is finished
     iloop = 0;
     while(iloop < loop)
         iloop = iloop + 1;
-        for iSlice=1:nSlice
+        for iSlice=1:n_slice
             tPlotFly = tic;
             set(imageHandleFly, 'CData', RGB{iSlice});
-            set(figureH, 'Name', ['fly through volume, slice ' dimSliceName ' = ' int2str(iSlice)]);
+            set(figure_h, 'Name', ['fly through volume, slice ' dim_slice_name ' = ' int2str(iSlice)]);
             pause(1/fps - toc(tPlotFly))
         end
     end
     
-    set(imageHandleFly, 'CData', RGB{endSlice});
-    set(figureH, 'Name', ['fly through volume, slice ' dimSliceName ...
-        ' = ' int2str(endSlice)]);
+    set(imageHandleFly, 'CData', RGB{end_slice});
+    set(figure_h, 'Name', ['fly through volume, slice ' dim_slice_name ...
+        ' = ' int2str(end_slice)]);
     
 catch exception
     switch exception.identifier

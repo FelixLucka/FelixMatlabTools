@@ -1,4 +1,4 @@
-function [RGB, clim, scaling, cMap] = data2RGB(data, para)
+function [RGB, clim, scaling, cmap] = data2RGB(data, para)
 % DATA2RGB converts data arrays into an RGB
 %
 % DESCRIPTION:
@@ -47,7 +47,7 @@ function [RGB, clim, scaling, cMap] = data2RGB(data, para)
 % ABOUT:
 %   author          - Felix Lucka
 %   date            - 13.12.2017
-%   last update     - 16.11.2021
+%   last update     - 13.10.2023
 %
 % See also determineClim, assignColorMap
 
@@ -64,14 +64,14 @@ if(iscell(data))
     
     if(~isfield(para, 'clim'))
         % get scaling from all data
-        [clim,scaling]  = determineClim(cell2mat(data), para);
+        [clim,scaling]  = determineClim(cell2vec(data), para);
         para.clim       = clim;
     end
     
     for i=1:length(data)
         
         % call data2RGB on single cell
-        RGB{i} = data2RGB(data{i}, para);
+        [RGB{i}, clim, scaling, cmap] = data2RGB(data{i}, para);
         
     end
     
@@ -85,8 +85,8 @@ else
     [clim, scaling]  = determineClim(data, para);
     
     % use thresholding?
-    [visuThres, dfVisuThres] = checkSetInput(para, 'visuThres', 'double', 0);
-    maxScale                 = max(abs(clim));
+    [visu_thres, df_visu_thres] = checkSetInput(para, 'visuThres', 'double', 0);
+    max_scale                   = max(abs(clim));
     
     switch dataType
         
@@ -95,9 +95,9 @@ else
             %%% scalar data
             
             % assign color map
-            cMap = assignColorMap(para);
+            cmap = assignColorMap(para);
 
-            if(dfVisuThres)
+            if(df_visu_thres)
                 thresholding = false;
             else
                 if(any(data < 0))
@@ -110,13 +110,13 @@ else
                 end
                 thresholding = true;
                 % relative or absolute thresholding?
-                thresRel = checkSetInput(para, 'thresRel', 'logical', true);
-                if(thresRel)
-                    visuThres = visuThres * maxScale;
+                thres_rel = checkSetInput(para, 'thresRel', 'logical', true);
+                if(thres_rel)
+                    visu_thres = visu_thres * max_scale;
                 end
-                thresMode  = checkSetInput(para,'thresMode', {'shrink', 'cut'}, 'error');
-                thresColor = checkSetInput(para,'thresColor', {'zero', 'white', 'black'}, 'zero');
-                thresMask  = abs(data(:)) < visuThres;
+                thres_mode  = checkSetInput(para,'thresMode', {'shrink', 'cut'}, 'error');
+                thres_color = checkSetInput(para,'thresColor', {'zero', 'white', 'black'}, 'zero');
+                thres_mask  = abs(data(:)) < visu_thres;
             end
             
             % scale data to [0 1];
@@ -127,9 +127,9 @@ else
             if(thresholding)
                 % apply thresholding (if can be applied before)
                 
-                switch thresMode
+                switch thres_mode
                     case 'shrink'
-                        Ctr = ([-visuThres, 0, visuThres] - clim(1)) / (clim(2) - clim(1));
+                        Ctr = ([-visu_thres, 0, visu_thres] - clim(1)) / (clim(2) - clim(1));
                         Ctr(Ctr < 0) = 0;
                         Ctr(Ctr > 1) = 1;
                         shrinkFun = @(x) (x <= Ctr(1)) .* (x * (Ctr(2)/Ctr(1)))...
@@ -146,27 +146,27 @@ else
             end
             
             % apply power scaling if needed to enhance contrast
-            scalingPower = checkSetInput(para, 'scalingPower', 'double', 1);
-            data  = data.^scalingPower;
+            scaling_power = checkSetInput(para, 'scalingPower', 'double', 1);
+            data  = data.^scaling_power;
             
             % build single color channels
-            resCmap  = size(cMap, 1);
-            cmapInd  = 1 + floor(data(:) * (resCmap-1));
-            sizeData = size(data);
+            res_cmap  = size(cmap, 1);
+            cmap_ind  = 1 + floor(data(:) * (res_cmap-1));
+            sz_data = size(data);
             clear data
-            R = cMap(cmapInd, 1);
-            G = cMap(cmapInd, 2);
-            B = cMap(cmapInd, 3);
-            clear cmapInd
-            R = reshape(R, sizeData);
-            G = reshape(G, sizeData);
-            B = reshape(B, sizeData);
+            r = cmap(cmap_ind, 1);
+            g = cmap(cmap_ind, 2);
+            b = cmap(cmap_ind, 3);
+            clear cmap_ind
+            r = reshape(r, sz_data);
+            g = reshape(g, sz_data);
+            b = reshape(b, sz_data);
             
             % set thresholding color to 0 or lowest color in colormap
             if(clim(1) <= 0 && clim(2) >= 0)
-                tcolor = cMap(1 + floor( -clim(1) / (clim(2) - clim(1)) * (resCmap - 1)), :);
+                tcolor = cmap(1 + floor( -clim(1) / (clim(2) - clim(1)) * (res_cmap - 1)), :);
             else
-                tcolor = cMap(1, :);
+                tcolor = cmap(1, :);
             end
             
         case 'vector'
@@ -180,18 +180,18 @@ else
             angle = wrapTo2Pi(atan2(data(:, :, 2), data(:, :, 1))) / (2*pi);
             data  = sqrt(sum(data.^2, 3));
             
-            if(dfVisuThres)
+            if(df_visu_thres)
                 thresholding = false;
             else
                 thresholding = true;
                 % relative or absolute thresholding?
-                thresRel = checkSetInput(para, 'thresRel', 'logical', true);
-                if(thresRel)
-                    visuThres = visuThres * maxScale;
+                thres_rel = checkSetInput(para, 'thresRel', 'logical', true);
+                if(thres_rel)
+                    visu_thres = visu_thres * max_scale;
                 end
-                thresMode  = checkSetInput(para, 'thresMode', {'shrink', 'cut'}, 'error');
-                thresColor = checkSetInput(para, 'thresColor', {'zero', 'white', 'black'}, 'zero');
-                thresMask  = abs(data(:)) < visuThres;
+                thres_mode  = checkSetInput(para, 'thresMode', {'shrink', 'cut'}, 'error');
+                thres_color = checkSetInput(para, 'thresColor', {'zero', 'white', 'black'}, 'zero');
+                thres_mask  = abs(data(:)) < visu_thres;
             end
             
             
@@ -202,9 +202,9 @@ else
             
             if(thresholding)
                 % apply thresholding (if can be applied before)
-                switch thresMode
+                switch thres_mode
                     case 'shrink'
-                        Ctr = ([-visuThres, 0, visuThres] - clim(1)) / (clim(2) - clim(1));
+                        Ctr = ([-visu_thres, 0, visu_thres] - clim(1)) / (clim(2) - clim(1));
                         Ctr(Ctr < 0) = 0;
                         Ctr(Ctr > 1) = 1;
                         shrinkFun = @(x) (x <= Ctr(1)) .* (x * (Ctr(2)/Ctr(1)))...
@@ -221,21 +221,21 @@ else
             end
             
             % apply power scaling if needed to enhance contrast
-            scalingPower = checkSetInput(para, 'scalingPower', 'double', 1);
-            data  = data.^scalingPower;
+            scaling_power = checkSetInput(para, 'scalingPower', 'double', 1);
+            data  = data.^scaling_power;
             
             % build single color channels
             colors = hsv2rgb([angle(:), data(:), ones(size(data(:)))]);
-            sizeData = size(data);
+            sz_data = size(data);
             clear angle data
             
-            R = reshape(colors(:, 1), sizeData);
-            G = reshape(colors(:, 2), sizeData);
-            B = reshape(colors(:, 3), sizeData);
+            r = reshape(colors(:, 1), sz_data);
+            g = reshape(colors(:, 2), sz_data);
+            b = reshape(colors(:, 3), sz_data);
             
             % set thresholding color to 0 in colormap
             tcolor = [0,0,0];
-            cMap   = [];
+            cmap   = [];
             
         case '2dim'
             
@@ -251,11 +251,11 @@ else
             para.colorMap = checkSetInput(para, 'colorMap', {'hs2dim', 'hv2dim', ...
                 'hsv2dim', 'red2dim', 'blue2dim', 'blue2red2dim'}, 'hv2dim');
             para.res      = checkSetInput(para, 'res', 'i,>0', 1001);
-            cMap          = assignColorMap(para);
-            resCmap       = size(cMap);
-            cMapR         = cMap(:,:,1);
-            cMapG         = cMap(:,:,2);
-            cMapB         = cMap(:,:,3);
+            cmap          = assignColorMap(para);
+            res_cmap       = size(cmap);
+            cmap_r         = cmap(:,:,1);
+            cmap_g         = cmap(:,:,2);
+            cmap_b         = cmap(:,:,3);
 
             % scale data to [0 1];
             data1 = (data1 - clim(1,1)) / (clim(1,2) - clim(1,1));
@@ -267,30 +267,30 @@ else
             data2(data2 > 1) = 1;
             
             % apply power scaling to data1 if needed to enhance contrast
-            scalingPower = checkSetInput(para, 'scalingPower', 'double', 1);
-            data1  = data1.^scalingPower;
+            scaling_power = checkSetInput(para, 'scalingPower', 'double', 1);
+            data1  = data1.^scaling_power;
             
             % build single color channels
-            cmapInd1 = 1 + floor(data1(:) * (resCmap(1)-1));
-            cmapInd2 = 1 + floor(data2(:) * (resCmap(2)-1));
-            sizeData = size(data1);
+            cmap_ind1 = 1 + floor(data1(:) * (res_cmap(1)-1));
+            cmap_ind2 = 1 + floor(data2(:) * (res_cmap(2)-1));
+            sz_data = size(data1);
 
-            R = cMapR(sub2ind(size(cMapR),  cmapInd1(:), cmapInd2(:)));
-            G = cMapG(sub2ind(size(cMapR),  cmapInd1(:), cmapInd2(:)));
-            B = cMapB(sub2ind(size(cMapR),  cmapInd1(:), cmapInd2(:)));
-            clear cmapInd
-            R = reshape(R, sizeData);
-            G = reshape(G, sizeData);
-            B = reshape(B, sizeData);
+            r = cmap_r(sub2ind(size(cmap_r),  cmap_ind1(:), cmap_ind2(:)));
+            g = cmap_g(sub2ind(size(cmap_r),  cmap_ind1(:), cmap_ind2(:)));
+            b = cmap_b(sub2ind(size(cmap_r),  cmap_ind1(:), cmap_ind2(:)));
+            clear cmap_ind
+            r = reshape(r, sz_data);
+            g = reshape(g, sz_data);
+            b = reshape(b, sz_data);
             
             % set thresholding color to 0 in colormap
-            tcolor = cMap(1,1,:);
+            tcolor = cmap(1,1,:);
             
     end
     
     if(thresholding)
         % assign the thresholding color to the thresholded areas
-        switch thresColor
+        switch thres_color
             case 'zero'
                 % set above
             case 'white'
@@ -299,24 +299,28 @@ else
                 tcolor = [0 0 0];
                 
         end
-        R(thresMask) = tcolor(1);
-        G(thresMask) = tcolor(2);
-        B(thresMask) = tcolor(3);
+        r(thres_mask) = tcolor(1);
+        g(thres_mask) = tcolor(2);
+        b(thres_mask) = tcolor(3);
     end
     
     
     % if mask should be used, assign the mask color to the corresponding
     % regions
-    [mask, dontMask] = checkSetInput(para, 'mask', 'logical', false);
-    if(~dontMask)
-        maskColor  = checkSetInput(para, 'maskColor', 'double', [1 1 1]);
-        R(mask(:)) = maskColor(1);
-        G(mask(:)) = maskColor(2);
-        B(mask(:)) = maskColor(3);
+    [mask, dont_mask] = checkSetInput(para, 'mask', 'logical', false);
+    if(~dont_mask)
+        mask_color  = checkSetInput(para, 'maskColor', 'double', [1 1 1]);
+        reduce_mask_fac = checkSetInput(para, 'reduceMaskFactor', '>0', 1);
+        if(reduce_mask_fac < 1)
+            mask = reduceMask(mask, reduce_mask_fac);
+        end
+        r(mask(:)) = mask_color(1);
+        g(mask(:)) = mask_color(2);
+        b(mask(:)) = mask_color(3);
     end
     
     % concatenate the single color channels to an RGB
-    RGB = cat(nDims(R)+1, R, G, B);
+    RGB = cat(nDims(r)+1, r, g, b);
     
 end
 

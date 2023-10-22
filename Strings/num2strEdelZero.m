@@ -1,4 +1,4 @@
-function str = num2strEdelZero(a, precisionStr)
+function str = num2strEdelZero(a, precision_str)
 %NUM2STREDELZERO removes the 0's from the output of num2str(a, precisionStr)
 % after the exponential sign: '1.00e-01' --> '1.00e-1'
 % 
@@ -15,28 +15,28 @@ function str = num2strEdelZero(a, precisionStr)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 05.11.2018
-%       last update     - 05.11.2018
+%       last update     - 16.05.2023
 %
 % See also int2strLead0
 
-str = num2str(a,precisionStr);
+str = num2str(a,precision_str);
 
 if(isinf(a))
     return
 end
 
-plusMinusPos = strfind(str,'+');
-if(isempty(plusMinusPos))
-    plusMinusPos = strfind(str,'-');
-    if(isempty(plusMinusPos) || plusMinusPos(end) == 1)
+plus_minus_pos = strfind(str,'+');
+if(isempty(plus_minus_pos))
+    plus_minus_pos = strfind(str,'-');
+    if(isempty(plus_minus_pos) || plus_minus_pos(end) == 1)
         error('invalid precision format')
     else
-        plusMinusPos = plusMinusPos(end);
+        plus_minus_pos = plus_minus_pos(end);
     end
 end
 
-if(strcmp(str(plusMinusPos+1),'0'))
-   str = [str(1:plusMinusPos) str(plusMinusPos+2:end)];
+if(strcmp(str(plus_minus_pos+1),'0'))
+   str = [str(1:plus_minus_pos) str(plus_minus_pos+2:end)];
 end
 
 end

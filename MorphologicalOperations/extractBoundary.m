@@ -1,4 +1,4 @@
-function boundaryMask = extractBoundary(mask, BC)
+function boundary_mask = extractBoundary(mask, bc)
 %EXTRACTBOUNDARY extracts a boundary mask of logical matrix or volume
 %
 % DESCRIPTION:
@@ -8,13 +8,13 @@ function boundaryMask = extractBoundary(mask, BC)
 %
 % USAGE:
 %       boundary_mask = extractBoundary(mask)
-%       boundary_mask = extractBoundary(mask,BC)
+%       boundary_mask = extractBoundary(mask, bc)
 %
 % INPUTS:
 %       mask - a 2D/3D logical array
 %
 % OPTIONAL INPUTS:
-%       BC - boundary conditions, 'natural', 'Neumann', 'NB' or '0': determines
+%       bc - boundary conditions, 'natural', 'Neumann', 'NB' or '0': determines
 %            how to deal with voxels on the boundary whose neighbours are
 %            all "true". For 'natural', 'Neumann', 'NB' they are not included
 %            in the boundary mask, for "0", they are.
@@ -25,19 +25,19 @@ function boundaryMask = extractBoundary(mask, BC)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 15.03.2017
-%       last update     - 14.11.2017
+%       last update     - 16.05.2023
 %
 % See also
 
 % check user defined value for BC, otherwise assign default value
 if(nargin < 2)
-    BC = 'natural';
+    bc = 'natural';
 end
 
 % get size of volume and create output mask
 dim           = ndims(mask);
 [nx, ny, nz]  = size(mask);
-boundaryMask = false(size(mask));
+boundary_mask = false(size(mask));
 
 % loop over inner voxels
 for i=2:nx-1
@@ -56,7 +56,7 @@ for i=2:nx-1
                         ~mask(i,   j+1))
                         
                         % the voxel is part of the boundary
-                        boundaryMask(i, j) = true;
+                        boundary_mask(i, j) = true;
                         
                     end
                     
@@ -76,7 +76,7 @@ for i=2:nx-1
                             ~mask(i,   j,   k+1))
                             
                             % the voxel is part of the boundary
-                            boundaryMask(i, j, k) = true;
+                            boundary_mask(i, j, k) = true;
                             
                         end
                         
@@ -93,7 +93,7 @@ for i=2:nx-1
 end
 
 % treat the boundaries
-switch BC
+switch bc
     
     case {'Neumann', 'NB', 'natural'}
         
@@ -101,12 +101,12 @@ switch BC
         
         switch dim
             case 2
-                boundaryMask([1, end], :) = mask([1, end], :);
-                boundaryMask(:, [1, end]) = mask(:, [1, end]);
+                boundary_mask([1, end], :) = mask([1, end], :);
+                boundary_mask(:, [1, end]) = mask(:, [1, end]);
             case 3
-                boundaryMask([1, end], :, :) = mask([1, end], :, :);
-                boundaryMask(:, [1, end], :) = mask(:, [1, end], :);
-                boundaryMask(:, :, [1, end]) = mask(:, :, [1, end]);
+                boundary_mask([1, end], :, :) = mask([1, end], :, :);
+                boundary_mask(:, [1, end], :) = mask(:, [1, end], :);
+                boundary_mask(:, :, [1, end]) = mask(:, :, [1, end]);
                 
         end
         

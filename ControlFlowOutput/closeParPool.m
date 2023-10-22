@@ -19,11 +19,22 @@ function closeParPool(pp, output)
 %
 % See also openParPool
 
+if(nargin < 1)
+    pp = gcp('nocreate');
+end
 
-if(output)
-    delete(pp)
-else
-    evalc('delete(pp)');
+if(nargin < 2)
+    output = false;
+end
+
+
+
+if(~isempty(pp))
+    if(output)
+        delete(pp)
+    else
+        evalc('delete(pp)');
+    end
 end
 
 end

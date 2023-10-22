@@ -3,7 +3,7 @@ function setRandomSeed(seed)
 %or shuffles is using clock()
 %
 % USAGE:
-%   SetRandomSeed(1) sets the global stream to a fixed value for exaclty 
+%   setRandomSeed(1) sets the global stream to a fixed value for exactly 
 %   reproduing the results of previous computations
 %   SetRandomSeed('rand') uses the clock function to construct a
 %   pseudo-random initilization of the stream
@@ -15,7 +15,7 @@ function setRandomSeed(seed)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 01.11.2018
-%       last update     - 01.11.2018
+%       last update     - 16.05.2023
 %
 % See also rng
 

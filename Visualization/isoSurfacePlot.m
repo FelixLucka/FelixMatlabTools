@@ -1,4 +1,4 @@
-function [plotH, axisH, figureH] = isoSurfacePlot(v, info, para)
+function [plot_h, axis_h, figure_h] = isoSurfacePlot(v, info, para)
 % ISOSURFACEPLOT plots the iso-level surfaces of a given image volume
 %
 %  USAGE:
@@ -25,7 +25,7 @@ function [plotH, axisH, figureH] = isoSurfacePlot(v, info, para)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 05.11.2018
-%       last update     - 21.02.2019
+%       last update     - 14.10.2023
 %
 % See also visualizeImage, slicePlot, flyThroughVolume, surfPlot
 
@@ -40,13 +40,13 @@ if(nargin < 3)
     para = [];
 end
 
-szV   = size(v);
+sz_v   = size(v);
 % normalize to 1
 v     = v / max(abs(v(:)));
-isNeg = any(v(:) < 0);
+is_neg = any(v(:) < 0);
 
 % read out geometric properties
-[x, y, z] = ndgrid(1:szV(1), 1:szV(2), 1:szV(3)); 
+[x, y, z] = ndgrid(1:sz_v(1), 1:sz_v(2), 1:sz_v(3)); 
 x  = checkSetInput(info, 'x', 'numeric', x); 
 y  = checkSetInput(info, 'y', 'numeric', y); 
 z  = checkSetInput(info, 'z', 'numeric', z); 
@@ -56,60 +56,60 @@ dy = checkSetInput(info, 'dy', '>0', y(1,2,1)-y(1,1,1));
 dz = checkSetInput(info, 'dz', '>0', z(1,1,2)-z(1,1,1));
 
 % read out iso-level values
-if(isNeg)
-    dfIsoValues = [-2/3, -1/3, 0, 1/3, 2/3];
+if(is_neg)
+    df_iso_values = [-2/3, -1/3, 0, 1/3, 2/3];
 else
-    dfIsoValues = [0.9, 0.75, 0.5, 0.25, 0.1];
+    df_iso_values = [0.9, 0.75, 0.5, 0.25, 0.1];
 end
-isoValues   = checkSetInput(para, 'isoValues', 'double', dfIsoValues);
+iso_values   = checkSetInput(para, 'isoValues', 'double', df_iso_values);
 
 % restrict the number of the patches faces for a faster visulization?
-nFacesMax = checkSetInput(para, 'nFacesMax', 'i,>0', Inf);
+n_faces_max = checkSetInput(para, 'nFacesMax', 'i,>0', Inf);
 
 % read out color map
-colorMap    = assignColorMap(para);
-resColorMap = size(colorMap, 1);
+color_map    = assignColorMap(para);
+res_color_map = size(color_map, 1);
 
 
-for i=1:length(isoValues)
+for i=1:length(iso_values)
     % for each iso-level value, extract surface by isosurface and reduce
     % the patch size if necessary
-    isoSurface{i} = isosurface(x, y, z, v, isoValues(i));
-    if(nFacesMax < size(isoSurface{i}.faces,1))
-        isoSurface{i} = reducepatch(isoSurface{i}, nFacesMax);
+    iso_surface{i} = isosurface(x, y, z, v, iso_values(i));
+    if(n_faces_max < size(iso_surface{i}.faces,1))
+        iso_surface{i} = reducepatch(iso_surface{i}, n_faces_max);
     end
 end
 
 
 % create new axis
-[axisH,dfFL] = checkSetInput(para, 'axisHandle', 'mixed', 1);
-if(dfFL)
-    [axisH, figureH] = createAxis(para);
+[axis_h, df] = checkSetInput(para, 'axisHandle', 'mixed', 1);
+if(df)
+    [axis_h, figure_h] = createAxis(para);
 end
 
 % set saxis properties
-set(axisH, 'DataAspectRatio', [dx, dy, dz]);
-xlim(axisH, [min(x(:)), max(x(:))]);
-ylim(axisH, [min(y(:)), max(y(:))]);
-zlim(axisH, [min(z(:)), max(z(:))]);
+set(axis_h, 'DataAspectRatio', [dx, dy, dz]);
+xlim(axis_h, [min(x(:)), max(x(:))]);
+ylim(axis_h, [min(y(:)), max(y(:))]);
+zlim(axis_h, [min(z(:)), max(z(:))]);
 xlabel('X'); 
 ylabel('Y');
 zlabel('Z');
-colormap(colorMap)
-hold(axisH,'on')
+colormap(color_map)
+hold(axis_h,'on')
 
 
-for i=1:length(isoValues)
+for i=1:length(iso_values)
     % plot all the surfaces
-    scaledIso = isoValues(i)/2 + 0.5;
-    FaceColor = colorMap(1+floor(scaledIso*(resColorMap-1)),:);
-    plotH{i}  = patch(isoSurface{i}, 'FaceColor', FaceColor,...
+    scaled_iso = iso_values(i)/2 + 0.5;
+    face_color = color_map(1+floor(scaled_iso*(res_color_map-1)),:);
+    plot_h{i}  = patch(iso_surface{i}, 'FaceColor', face_color,...
         'LineStyle', 'none', 'FaceLighting', 'phong');
 end
 
 % add light and fix view point          
-lightAndView(axisH, para)
-hold(axisH,'off')
+lightAndView(axis_h, para)
+hold(axis_h,'off')
 
 drawnow()
 

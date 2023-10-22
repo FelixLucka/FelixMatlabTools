@@ -1,4 +1,4 @@
-function lightAndView(axisH, para)
+function lightAndView(axis_h, para)
 %LIGHTANDVIEW add light to a figure and sets the view point
 %
 % USAGE:
@@ -17,19 +17,19 @@ function lightAndView(axisH, para)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 05.11.2018
-%       last update     - 05.11.2018
+%       last update     - 14.10.2023
 %
 % See also
 
-addLight = checkSetInput(para, 'addLight', 'logical', true);
-if(addLight)
+add_light = checkSetInput(para, 'addLight', 'logical', true);
+if(add_light)
     camlight right; lighting phong
 end
 
 
-[viewPoint, df] = checkSetInput(para, 'viewPoint', 'double', []);
+[view_point, df] = checkSetInput(para, 'viewPoint', 'double', []);
 if(~df)
-    view(axisH, viewPoint);
+    view(axis_h, view_point);
 end
 
 end

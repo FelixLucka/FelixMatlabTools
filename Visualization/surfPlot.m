@@ -1,11 +1,11 @@
-function [pSurf, axisH, figureH] = surfPlot(surfPatch, para)
+function [p_surf, axis_h, fig_h] = surfPlot(surf_patch, para)
 %SURFPLOT generates a surface plot
 %
 % USAGE:
-%   surfPlot(surfPatch, para)
+%   surfPlot(surf_patch, para)
 %
 % INPUTS:
-%   surfPatch - a struct containing the fields 'faces' and 'vertices', see
+%   surf_patch - a struct containing the fields 'faces' and 'vertices', see
 %               patch.m
 %
 % OPTIONAL INPUTS:
@@ -22,14 +22,14 @@ function [pSurf, axisH, figureH] = surfPlot(surfPatch, para)
 %                     display data on the vertices.
 %
 % OUTPUTS:
-%   pSurf   - Patch object
-%   axisH   - handle to axis
-%   figureH - handle to figure
+%   p_surf - Patch object
+%   axis_h - handle to axis
+%   fig_h  - handle to figure
 %
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 03.12.2018
-%       last update     - 03.12.2018
+%       last update     - 14.10.2023
 %
 % See also
 
@@ -39,30 +39,30 @@ if(nargin < 2)
     para = [];
 end
 
-[axisH, figureH] = assignOrCreateAxisHandle(para);
+[axis_h, fig_h] = assignOrCreateAxisHandle(para);
 
-faceAlpha    = checkSetInput(para, 'faceAlpha', 'double', 1);
-faceLighting = checkSetInput(para, 'faceLighting', {'gouraud', 'flat'}, 'gouraud');
+face_alpha    = checkSetInput(para, 'faceAlpha', 'double', 1);
+face_lighting = checkSetInput(para, 'faceLighting', {'gouraud', 'flat'}, 'gouraud');
 
-plotType = checkSetInput(para, 'plotType', {'geometry', 'data'}, 'geometry');
+plot_type = checkSetInput(para, 'plotType', {'geometry', 'data'}, 'geometry');
 
-switch plotType
+switch plot_type
     
     case 'geometry'
         
-        faceColor     = checkSetInput(para,'faceColor', 'double', [1 0 0]);
-        edgesLinstyle = checkSetInput(para,'edgesLinstyle', {'-','none'}, '-');
-        pSurf = patch('Faces', surfPatch.faces, 'Vertices', surfPatch.vertices,...
-            'Parent', axisH, 'FaceAlpha', faceAlpha, 'LineStyle', ...
-            edgesLinstyle, 'FaceColor', faceColor, 'FaceLighting', faceLighting);
+        face_color     = checkSetInput(para,'faceColor', 'double', [1 0 0]);
+        edges_linstyle = checkSetInput(para,'edgesLinstyle', {'-','none'}, '-');
+        p_surf = patch('Faces', surf_patch.faces, 'Vertices', surf_patch.vertices,...
+            'Parent', axis_h, 'FaceAlpha', face_alpha, 'LineStyle', ...
+            edges_linstyle, 'FaceColor', face_color, 'FaceLighting', face_lighting);
         
     case 'data'
 
         data  = checkSetInput(para, 'data', 'double', 'error');
         cdata = data2RGB(data, para);
-        pSurf = patch('Faces',surfPatch.faces, 'Vertices', surfPatch.vertices,...
-            'Parent', axisH, 'LineStyle', 'none', 'FaceColor', 'interp',...
-            'FaceVertexCData', cdata, 'FaceLighting', faceLighting);
+        p_surf = patch('Faces',surf_patch.faces, 'Vertices', surf_patch.vertices,...
+            'Parent', axis_h, 'LineStyle', 'none', 'FaceColor', 'interp',...
+            'FaceVertexCData', cdata, 'FaceLighting', face_lighting);
         
 end
 

@@ -2,7 +2,7 @@ function RGB = str2RGB(str)
 % STR2RGB retruns the RGB code for a given color name
 %
 %  USAGE:
-%   RGB = str2RGB('red')
+%   rgb = str2RGB('red')
 %
 %  INPUTS:
 %   str    - color name
@@ -14,7 +14,7 @@ function RGB = str2RGB(str)
 %  ABOUT:
 %       author          - Felix Lucka
 %       date            - 05.11.2018
-%       last update     - 05.11.2018
+%       last update     - 14.10.2023
 %
 % See also getColorMap
 

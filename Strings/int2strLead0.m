@@ -1,4 +1,4 @@
-function str = int2strLead0(a,digits)
+function str = int2strLead0(a, digits)
 % INT2STRLEAD0 converts an integer to a string but attaches 0s in front to 
 % obtain a predefined total number of digits
 %
@@ -15,9 +15,9 @@ function str = int2strLead0(a,digits)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 05.11.2018
-%       last update     - 05.11.2018
+%       last update     - 16.05.2023
 %
-% See also num2strEdelZero
+% See also num2strEdelZero, int2strFixLength
 
 str = int2str(a);
 for i=1:(digits-length(str))

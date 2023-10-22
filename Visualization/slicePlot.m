@@ -1,4 +1,4 @@
-function [figureH, subPlotH, RGB] = slicePlot(im, info, para)
+function [figure_h, sub_plot_h, RGB] = slicePlot(im, info, para)
 % SLICEPLOT plots the slices of a given 3D volume or a movie
 % of a dynamic sequence of 3D volumes
 %
@@ -6,7 +6,7 @@ function [figureH, subPlotH, RGB] = slicePlot(im, info, para)
 %   TODO
 %
 % USAGE:
-%  [figureH, RGB] = slicePlot(im, setting, para)
+%  [figure_h, RGB] = slicePlot(im, setting, para)
 %  slicePlot(p, setting)
 %
 %  INPUTS:
@@ -15,6 +15,12 @@ function [figureH, subPlotH, RGB] = slicePlot(im, info, para)
 %   para  - a struct containing optional parameters
 %       'dimSlice' - dimension to slice (1,2 or 3)
 %       'slices2show' - array of slice values to show
+%       'mask' - a 3D logical array of voxels, each of which is "true" will
+%       get the following color
+%       'maskColor' - RGB color to give to the masked pixels
+%       'reduceMaskFactor' - a factor by which the mask is subsampled
+%       'colPlots' - number of colums used to plot the slices
+%       'rowPlots' - number of rows used to plot the slices
 %       'figureHandle'- A handle to an existing figure in which the plot should be
 %                       placed.
 %       'title'       - The title of the figure
@@ -34,14 +40,14 @@ function [figureH, subPlotH, RGB] = slicePlot(im, info, para)
 %       BitmapFont.m; (movies only)
 %
 %  OUTPUTS:
-%   figureH   - handle to the figure
-%   subPlotH  - handle to the subplot axis
-%   RGB       - the slices views as RGB images
+%   figure_h   - handle to the figure
+%   sub_plot_h - handle to the subplot axis
+%   RGB        - the slices views as RGB images
 %
 % ABOUT:
 %   author          - Felix Lucka
 %   date            - 01.03.2018
-%   last update     - 01.03.2018
+%   last update     - 14.10.2023
 %
 % See also visualizeImage, maxIntensityProjection, flyThroughReconstruction
 
@@ -65,78 +71,100 @@ switch info.type
     case 'static'
         
         % create figure and axis
-        figureH     = assignOrCreateFigureHandle(para);
-        titleFigure = checkSetInput(para, 'title', 'char', 'Slice Views');
-        set(figureH, 'Name', titleFigure)
+        figure_h   = assignOrCreateFigureHandle(para);
+        title_fig  = checkSetInput(para, 'title', 'char', 'Slice Views');
+        set(figure_h, 'Name', title_fig)
         
         % read out dimension to slice
-        dimSlice    = checkSetInput(para, 'dimSlice', 'i,>0', 1);
+        dim_slice    = checkSetInput(para, 'dimSlice', 'i,>0', 1);
+
         % names of the slices
-        dimNames     = {'X','Y','Z'};
-        dimSliceName = dimNames{dimSlice};
+        dim_names     = {'X','Y','Z'};
+        dim_slice_name = dim_names(dim_slice);
         % read out which slices to show
-        slices2show  = checkSetInput(para, 'slices2show', 'i,>0', ...
-                                               ceil(size(im, dimSlice)/2));
-        nSlices      = length(slices2show);
-        
+        slices2show  = checkSetInput(para, 'slices2show', 'i,>0', ceil(size(im, dim_slice(1))/2));
+        n_sl         = length(slices2show);
+        if(isscalar(dim_slice))
+            dim_slice = dim_slice * ones(1, n_sl);
+        end
+
         % prepare slices
-        im = sliceArray(im, dimSlice, slices2show, true);
-        [RGB, ~, ~, cmap] = data2RGB(im, para);
-        if(length(slices2show) > 1)
-            RGB = cellfun(@(x) squeeze(x), num2cell(RGB,setdiff(1:4,dimSlice)), ...
-                'UniformOutput', false);
-        else
-            RGB = {squeeze(RGB)};
+        for i_sl = 1:n_sl
+            slices{i_sl} = sliceArray(im, dim_slice(i_sl), slices2show(i_sl), true);
         end
         
+
+        [RGB, ~, ~, cmap] = data2RGB(slices, removeFields(para,{'mask'}));
+%         if(length(slices2show) > 1)
+%             RGB = cellfun(@(x) squeeze(x), num2cell(RGB,setdiff(1:4,dim_slice)), ...
+%                 'UniformOutput', false);
+%         else
+%             RGB = {squeeze(RGB)};
+%         end
+        
+        % add mask to image?
+        [mask, no_mask] = checkSetInput(para,'mask', 'mixed', false);
+        if(~no_mask)
+            mask_color = checkSetInput(para, 'maskColor', 'mixed', [1 0 1]);
+            reduce_mask_factor = checkSetInput(para, 'reduceMaskFactor', '>0', 1);
+            for i_slice = 1:length(RGB)
+                mask_i = sliceArray(mask, dim_slice(i_slice), slices2show(i_slice), true);
+                if(reduce_mask_factor < 1)
+                    mask_i = reduceMask(mask_i, reduce_mask_factor);
+                end
+                RGB{i_slice} = maskRGB(RGB{i_slice}, mask_i, mask_color);
+            end
+        end
+                
         %%% printing
         print     = checkSetInput(para,'print','logical',false);
         if(print)
-            printPara = [];
-            rootFilename = checkSetInput(para, 'fileName', 'char', 'recSol');
-            rootFilename = strrep(rootFilename, '.png', '');
+            print_para = [];
+            root_file_name = checkSetInput(para, 'fileName', 'char', 'recSol');
+            root_file_name = strrep(root_file_name, '.png', '');
             
-            incRes4AnisoVoxel = checkSetInput(para, 'incRes4AnisoVoxel', 'logical', false);
-            if(incRes4AnisoVoxel)
-                
-                switch dimSlice
+            inc_res_4_aniso_voxel = checkSetInput(para, 'incRes4AnisoVoxel', 'logical', false);
+            if(inc_res_4_aniso_voxel)
+                switch dim_slice
                     case 1
-                        printPara.printPixPerPix = round([info.dy,info.dz]/min(info.dy,info.dz));
+                        print_para.printPixPerPix = round([info.dy,info.dz]/min(info.dy,info.dz));
                     case 2
-                        printPara.printPixPerPix = round([info.dx,info.dz]/min(info.dx,info.dz));
+                        print_para.printPixPerPix = round([info.dx,info.dz]/min(info.dx,info.dz));
                     case 3
-                        printPara.printPixPerPix = round([info.dx,info.dy]/min(info.dy,info.dx));
+                        print_para.printPixPerPix = round([info.dx,info.dy]/min(info.dy,info.dx));
                 end
             end
             
             
-            trailingZeros = checkSetInput(para, 'trailingZeros', 'logical', false);
-            if(trailingZeros)
-                integerFormat = ['%0' int2str(1+floor(log10(nSlices))) 'd'];
+            trailing_zeros = checkSetInput(para, 'trailingZeros', 'logical', false);
+            if(trailing_zeros)
+                integer_format = ['%0' int2str(1+floor(log10(n_sl))) 'd'];
             else
-                integerFormat = '%d';
+                integer_format = '%d';
             end
-            
+
+            print_para.printPixPerPix = checkSetInput(para, 'printPixPerPix', 'i,>0', [1 1]);            
             disp('print the desired slices to png');
-            for iSlice=1:length(slices2show)
-                printPara.fileName = [rootFilename '_slice' dimSliceName ...
-                    sprintf(integerFormat, slices2show(iSlice)) '.png'];
-                printRGB(squeeze(RGB{iSlice}), printPara);
+            for i_slice=1:length(slices2show)
+                print_para.fileName = [root_file_name '_slice' dim_slice_name{i_slice} ...
+                    sprintf(integer_format, slices2show(i_slice)) '.png'];
+                printRGB(squeeze(RGB{i_slice}), print_para);
             end
         end
         
         
-        
         %%% plotting
-        colPlots = ceil(sqrt(nSlices));
-        rowPlots = ceil(nSlices/colPlots);
-        for iSlice = 1:nSlices
-            subPlotH{iSlice} = subplot(rowPlots, colPlots, iSlice, 'Parent', figureH);
-            colormap(subPlotH{iSlice}, cmap);
-            image(RGB{iSlice}, 'Parent', subPlotH{iSlice});
-            set(subPlotH{iSlice}, 'YTick', zeros(1,0), 'YDir', 'reverse',...
+        screen_info  = get( groot, 'Screensize' );
+        screen_ratio = screen_info(3)/screen_info(4);
+        col_plots = checkSetInput(para, 'colPlots', 'i,>0', floor(sqrt(n_sl) * screen_ratio));
+        row_plots = checkSetInput(para, 'rowPlots', 'i,>0', ceil(n_sl/col_plots));
+        for i_slice = 1:n_sl
+            sub_plot_h{i_slice} = subplot(row_plots, col_plots, i_slice, 'Parent', figure_h);
+            colormap(sub_plot_h{i_slice}, cmap);
+            image(RGB{i_slice}, 'Parent', sub_plot_h{i_slice});
+            set(sub_plot_h{i_slice}, 'YTick', zeros(1,0), 'YDir', 'reverse',...
                 'XTick', zeros(1,0), 'Layer', 'top', 'DataAspectRatio', [1 1 1])
-            title([dimSliceName ' = ' int2str(slices2show(iSlice))]);
+            title([dim_slice_name{i_slice} ' = ' int2str(slices2show(i_slice))]);
         end
         drawnow();
         
@@ -145,17 +173,17 @@ switch info.type
         T = length(im);
         
         %%% read inputs and parameter
-        fps                = checkSetInput(para, 'fps', '>0', 1);
-        loop               = checkSetInput(para, 'loop', 'i,>0', 1);
-        print              = checkSetInput(para, 'print', 'logical', false);
-        addFrameIdentifier = checkSetInput(para, 'addFrameIdentifier', 'logical', false);
-        fontSize           = checkSetInput(para, 'fontSize', 'i,>0', 20);
-        animatedGif        = checkSetInput(para, 'animatedGif', 'logical', false);
-        endFrame           = min(T, checkSetInput(para,'endFrame', 'i,>0', ceil(T/2)));
+        fps          = checkSetInput(para, 'fps', '>0', 1);
+        loop         = checkSetInput(para, 'loop', 'i,>0', 1);
+        print        = checkSetInput(para, 'print', 'logical', false);
+        add_frame_id = checkSetInput(para, 'addFrameId', 'logical', false);
+        font_sz      = checkSetInput(para, 'fontSize', 'i,>0', 20);
+        animated_gif = checkSetInput(para, 'animatedGif', 'logical', false);
+        end_frame     = min(T, checkSetInput(para,'endFrame', 'i,>0', ceil(T/2)));
         
         % add a string that identifies the frame number
-        if(addFrameIdentifier)
-            font = BitmapFont('Arial', fontSize, 't=1234567890');
+        if(add_frame_id)
+            font = BitmapFont('Arial', font_sz, 't=1234567890');
         end
         
         % extend fps to vector
@@ -166,31 +194,31 @@ switch info.type
         % try loop determines function without error if user closes the window
         try
             
-            figureH = assignOrCreateFigureHandle(para);
-            set(figureH, 'Name', 'preparing RGB data...');
+            figure_h = assignOrCreateFigureHandle(para);
+            set(figure_h, 'Name', 'preparing RGB data...');
             drawnow();
             
             
             %%% slice  the solutions
-            dimSlice     = checkSetInput(para, 'dimSlice', 'i,>0', 1);
+            dim_slice     = checkSetInput(para, 'dimSlice', 'i,>0', 1);
             % names of the slices
-            dimNames     = {'X', 'Y', 'Z'};
-            dimSliceName = dimNames{dimSlice};
+            dim_names     = {'X', 'Y', 'Z'};
+            dim_slice_name = dim_names{dim_slice};
             % read out which slices to show
             slices2show  = checkSetInput(para, 'slices2show', 'i,>0', ...
-                ceil(size(im{1}, dimSlice)/2));
-            nSlices = length(slices2show);
+                ceil(size(im{1}, dim_slice)/2));
+            n_sl = length(slices2show);
             
             % prepare slices
             for iFrame = 1:T
-                im{iFrame} = sliceArray(im{iFrame}, dimSlice, slices2show);
+                im{iFrame} = sliceArray(im{iFrame}, dim_slice, slices2show);
             end
             
             
             %%% first prepare and print all the RGBs
-            dynamicScaling = checkSetInput(para, 'dynamicScaling',...
+            dynamic_scaling = checkSetInput(para, 'dynamicScaling',...
                 {'singleFrame', 'allFrames'}, 'singleFrame');
-            switch dynamicScaling
+            switch dynamic_scaling
                 case 'singleFrame'
                 case 'allFrames'
                     [clim, scaling] = determineClim(vec(cell2mat(im)), para);
@@ -203,116 +231,113 @@ switch info.type
                 [RGB{iFrame}, ~, ~, cmap] = data2RGB(im{iFrame}, para);
                 if(length(slices2show) > 1)
                     RGB{iFrame} = cellfun(@(x) squeeze(x),num2cell(RGB{iFrame},...
-                        setdiff(1:4, dimSlice)), 'UniformOutput', false);
+                        setdiff(1:4, dim_slice)), 'UniformOutput', false);
                 else
                     RGB{iFrame} = {squeeze(RGB{iFrame})};
                 end
                 
                 %%% printing
-                trailingZeros = checkSetInput(para, 'trailingZeros', 'logical', false);
-                if(trailingZeros)
-                    integerFormat = ['%0' int2str(1+floor(log10(nSlices))) 'd'];
+                trailing_zeros = checkSetInput(para, 'trailingZeros', 'logical', false);
+                if(trailing_zeros)
+                    integer_format = ['%0' int2str(1+floor(log10(n_sl))) 'd'];
                 else
-                    integerFormat = '%d';
+                    integer_format = '%d';
                 end
                 
                 if(print)
-                    printPara = [];
-                    rootFilename = checkSetInput(para,'fileName', 'char', 'recSol_t$frame$');
-                    rootFilename = strrep(rootFilename, '.png', '');
-                    rootFilename = strrep(rootFilename, '$frame$', int2str(iFrame));
+                    print_para = [];
+                    root_file_name = checkSetInput(para,'fileName', 'char', 'recSol_t$frame$');
+                    root_file_name = strrep(root_file_name, '.png', '');
+                    root_file_name = strrep(root_file_name, '$frame$', int2str(iFrame));
                     
-                    incRes4AnisoVoxel = checkSetInput(para, 'incRes4AnisoVoxel', 'logical', false);
-                    if(incRes4AnisoVoxel)
-                        switch dimSlice
+                    inc_res_4_aniso_voxel = checkSetInput(para, 'incRes4AnisoVoxel', 'logical', false);
+                    if(inc_res_4_aniso_voxel)
+                        switch dim_slice
                             case 1
-                                printPara.printPixPerPix = round([info.dy,info.dz]/min(info.dy,info.dz));
+                                print_para.printPixPerPix = round([info.dy,info.dz]/min(info.dy,info.dz));
                             case 2
-                                printPara.printPixPerPix = round([info.dx,info.dz]/min(info.dx,info.dz));
+                                print_para.printPixPerPix = round([info.dx,info.dz]/min(info.dx,info.dz));
                             case 3
-                                printPara.printPixPerPix = round([info.dx,info.dy]/min(info.dy,info.dx));
+                                print_para.printPixPerPix = round([info.dx,info.dy]/min(info.dy,info.dx));
                         end
                     end
                     
                     
-                    for iSlice=1:length(slices2show)
-                        printPara.fileName = [rootFilename '_slice' dimSliceName ...
-                            sprintf(integerFormat, slices2show(iSlice)) '.png'];
-                        printRGB(squeeze(RGB{iFrame}{iSlice}), printPara);
+                    for i_slice=1:length(slices2show)
+                        print_para.fileName = [root_file_name '_slice' dim_slice_name ...
+                            sprintf(integer_format, slices2show(i_slice)) '.png'];
+                        printRGB(squeeze(RGB{iFrame}{i_slice}), print_para);
                     end
                 end
                 
-                if(addFrameIdentifier)
+                if(add_frame_id)
                     % add text to identify the frames, in top left corner,
                     % with offset = fontSize (can be extended later)
-                    frameIdentifier = ['t=' int2str(iFrame)];
-                    for iSlice=1:length(slices2show)
-                        RGB{iFrame}{iSlice} = AddTextToImage(RGB{iFrame}{iSlice},...
-                            frameIdentifier, ceil(fontSize/4)*[1 1], [1 0 1], font);
+                    frame_id = ['t=' int2str(iFrame)];
+                    for i_slice=1:length(slices2show)
+                        RGB{iFrame}{i_slice} = AddTextToImage(RGB{iFrame}{i_slice},...
+                            frame_id, ceil(font_sz/4)*[1 1], [1 0 1], font);
                     end
                 end
             end
+
             
             % generate animated gif before the images is shown
-            if(animatedGif)
-                set(figureH,'Name','generating animated gif...');
-                animationPara = para;
-                rootFilename  = checkSetInput(animationPara, 'fileName', ...
+            if(animated_gif)
+                set(figure_h,'Name','generating animated gif...');
+                animation_para = para;
+                root_file_name  = checkSetInput(animation_para, 'fileName', ...
                     'char', [pwd '/recSolMovie']);
-                rootFilename  = strrep(rootFilename, '.gif','');
-                rootFilename  = strrep(rootFilename, '$frame$', '');
-                animationPara.fps = checkSetInput(animationPara, 'fpsMovie', 'double', mean(fps));
+                root_file_name  = strrep(root_file_name, '.gif','');
+                root_file_name  = strrep(root_file_name, '$frame$', '');
+                animation_para.fps = checkSetInput(animation_para, 'fpsMovie', 'double', mean(fps));
                 
-                for iSlice=1:length(slices2show)
-                    animationPara.fileName = [rootFilename '_slice' dimSliceName ...
-                        sprintf(integerFormat, slices2show(iSlice))];
-                    RGBmovie = cell(1, T);
+                for i_slice=1:length(slices2show)
+                    animation_para.fileName = [root_file_name '_slice' dim_slice_name ...
+                        sprintf(integer_format, slices2show(i_slice))];
+                    rgb_movie = cell(1, T);
                     for iFrame=1:T
-                        RGBmovie{iFrame} = RGB{iFrame}{iSlice};
+                        rgb_movie{iFrame} = RGB{iFrame}{i_slice};
                     end
                     % call movieFromRGB.m to do the conversion
-                    movieFromRGB(RGBmovie, animationPara);
+                    movieFromRGB(rgb_movie, animation_para);
                 end
             end
             
             
             %%% make axis
-            colPlots = ceil(sqrt(nSlices));
-            rowPlots = ceil(nSlices/colPlots);
-            for iSlice = 1:nSlices
-                subPlotH{iSlice} = subplot(rowPlots, colPlots, iSlice, 'Parent', figureH);
-                colormap(subPlotH{iSlice}, cmap);
-                image(zeros(size(RGB{iFrame}{iSlice})), 'Parent', subPlotH{iSlice});
-                set(subPlotH{iSlice}, 'YTick', zeros(1,0), 'YDir', 'reverse',...
+            col_plots = ceil(sqrt(n_sl));
+            row_plots = ceil(n_sl/col_plots);
+            for i_slice = 1:n_sl
+                sub_plot_h{i_slice} = subplot(row_plots, col_plots, i_slice, 'Parent', figure_h);
+                colormap(sub_plot_h{i_slice}, cmap);
+                image(zeros(size(RGB{iFrame}{i_slice})), 'Parent', sub_plot_h{i_slice});
+                set(sub_plot_h{i_slice}, 'YTick', zeros(1,0), 'YDir', 'reverse',...
                     'XTick', zeros(1,0), 'Layer', 'top', 'DataAspectRatio', [1 1 1])
-                title([dimSliceName ' = ' int2str(slices2show(iSlice))]);
-                imageHandleFly{iSlice} = get(subPlotH{iSlice}, 'Children');
+                title([dim_slice_name ' = ' int2str(slices2show(i_slice))]);
+                image_handle_fly{i_slice} = get(sub_plot_h{i_slice}, 'Children');
             end
-            
-            
             
             
             %%% plotting, the try block will catch an error if the figure is closed
             %%% before the visulization is finished
-            iloop = 0;
-            while(iloop < loop)
-                iloop = iloop + 1;
+            i_loop = 0;
+            while(i_loop < loop)
+                i_loop = i_loop + 1;
                 for t=1:T
-                    tPlotFly = tic;
-                    for iSlice = 1:nSlices
-                        set(imageHandleFly{iSlice}, 'CData', RGB{t}{iSlice});
+                    t_plot_fly = tic;
+                    for i_slice = 1:n_sl
+                        set(image_handle_fly{i_slice}, 'CData', RGB{t}{i_slice});
                     end
-                    set(figureH, 'Name', ['Maximum intensity projection, frame = ' int2str(t)]);
-                    pause(1/fps(t) - toc(tPlotFly))
+                    set(figure_h, 'Name', ['Maximum intensity projection, frame = ' int2str(t)]);
+                    pause(1/fps(t) - toc(t_plot_fly))
                 end
             end
-            for iSlice = 1:nSlices
-                set(imageHandleFly{iSlice}, 'CData', RGB{endFrame}{iSlice});
+            for i_slice = 1:n_sl
+                set(image_handle_fly{i_slice}, 'CData', RGB{end_frame}{i_slice});
             end
-            set(figureH,'Name',['Maximum intensity projection, frame = ' int2str(endFrame)]);
-            
-            %close(figureH);
-            
+            set(figure_h,'Name',['Maximum intensity projection, frame = ' int2str(end_frame)]);
+                        
         catch exception
             switch exception.identifier
                 case 'MATLAB:class:InvalidHandle'

@@ -26,9 +26,9 @@ function W = warpingMatrix(v, para)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 18.12.2018
-%       last update     - 22.05.2019
+%       last update     - 16.05.2023
 %
-% See also warpImage
+% See also warpImage, interpolationMatrix
 
 % check user defined value for para, otherwise assign default value
 if(nargin < 2)
@@ -41,63 +41,63 @@ else
     dim    = nDims(v)-1;
 end
 
-sizeIm = size(v);
-sizeIm = sizeIm(1:dim);
-n      = prod(sizeIm);
+size_im = size(v);
+size_im = size_im(1:dim);
+n       = prod(size_im);
 
-interpolationMethod = checkSetInput(para, 'interpolationMethod', ...
+interpolation_method = checkSetInput(para, 'interpolationMethod', ...
     {'linear', 'nearest', 'pchip', 'cubic', 'spline', 'makima'}, 'linear');
 
 % check if spatial grids are given, otherwise construct
-[X, dfX] = checkSetInput(para, 'X', 'cell', 0);
-if(dfX)
+[X, df_X] = checkSetInput(para, 'X', 'cell', 0);
+if(df_X)
     clear X
-    for iDim = 1:dim
-        gridVec{iDim} = (1:sizeIm(iDim))';
+    for i_dim = 1:dim
+        grid_vec{i_dim} = (1:size_im(i_dim))';
     end
-    gridVec = checkSetInput(para, 'gridVec', 'cell', gridVec);
+    grid_vec = checkSetInput(para, 'gridVec', 'cell', grid_vec);
     
     % set up grids
-    argOutStr = '[';
-    for iDim=1:dim
-        argOutStr = [argOutStr 'X{' int2str(iDim) '},'];
+    arg_out_str = '[';
+    for i_dim=1:dim
+        arg_out_str = [arg_out_str 'X{' int2str(i_dim) '},'];
     end
-    argOutStr = [argOutStr(1:end-1), ']'];
-    eval([argOutStr ' = ndgrid(gridVec{:});'])
+    arg_out_str = [arg_out_str(1:end-1), ']'];
+    eval([arg_out_str ' = ndgrid(grid_vec{:});'])
 else
-    [gridVec, dfg] = checkSetInput(para, 'gridVec', 'cell', 0);
+    [grid_vec, dfg] = checkSetInput(para, 'gridVec', 'cell', 0);
     if(dfg)
-        clear gridVec
+        clear grid_vec
         % extract grid vectors
-        for iDim = 1:dim
-            gridVec{iDim} = X{iDim};
-            for jDim = 1:dim
-                if(jDim ~= iDim)
-                    gridVec{iDim} = sliceArray(gridVec{iDim}, jDim, 1, false);
+        for i_dim = 1:dim
+            grid_vec{i_dim} = X{i_dim};
+            for j_dim = 1:dim
+                if(j_dim ~= i_dim)
+                    grid_vec{i_dim} = sliceArray(grid_vec{i_dim}, j_dim, 1, false);
                 end
             end
-            gridVec{iDim} = vec(gridVec{iDim})';
+            grid_vec{i_dim} = vec(grid_vec{i_dim})';
         end
     end
 end
 
 % take care of nan values in V
-isnanV    = isnan(v);
-v(isnanV) = 0;
+is_nan_v    = isnan(v);
+v(is_nan_v) = 0;
 
 % compute propagated points and restrict to grid
-Xq = zeros(n, dim, 'like', v);
+X_q = zeros(n, dim, 'like', v);
 
-for iDim=1:dim
-    Xintp       = X{iDim} + sliceArray(v, dim+1, iDim, true);
-    Xintp       = max(Xintp, gridVec{iDim}(1));
-    Xintp       = min(Xintp, gridVec{iDim}(end));
-    Xq(:, iDim) = Xintp(:); 
+for i_dim=1:dim
+    X_intp       = X{i_dim} + sliceArray(v, dim+1, i_dim, true);
+    X_intp       = max(X_intp, grid_vec{i_dim}(1));
+    X_intp       = min(X_intp, grid_vec{i_dim}(end));
+    X_q(:, i_dim) = X_intp(:); 
 end
 
-intPara = [];
-intPara.interpolationMethod = interpolationMethod;
+int_para = [];
+int_para.interpolationMethod = interpolation_method;
 % call interpolationMatrix.m
-W = interpolationMatrix(gridVec, Xq, intPara);
+W = interpolationMatrix(grid_vec, X_q, int_para);
 
 end

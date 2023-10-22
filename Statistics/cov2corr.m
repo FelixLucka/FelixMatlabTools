@@ -1,4 +1,4 @@
-function corrMat = cov2corr(covMat)
+function corr_mat = cov2corr(cov_mat)
 %COV2CORR converts a covariance matrix to a correlation matrix
 %
 % DESCRIPTION: 
@@ -6,26 +6,26 @@ function corrMat = cov2corr(covMat)
 %   correlation matrix of multi-variate random variables. 
 %
 % USAGE:
-%   corrMat = cov2corr(covMat)
+%   corr_mat = cov2corr(covMat)
 %
 % INPUTS:
-%   covMat - covariance matrix as computed by cov()
+%   cov_mat - covariance matrix as computed by cov()
 %
 % OUTPUTS:
-%   corrMat - correltation matrix
+%   corr_mat - correltation matrix
 %
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 05.11.2018
-%       last update     - 05.11.2018
+%       last update     - 16.05.2023
 %
 % See also covariancePlot
 
-varVec  = diag(covMat);
+varVec  = diag(cov_mat);
 sigma   = sqrt(varVec);
-corrMat = bsxfun(@rdivide, covMat,  sigma);
-corrMat = bsxfun(@rdivide, corrMat, sigma');
-t       = find(abs(corrMat) > 1); corrMat(t) = corrMat(t)./abs(corrMat(t));
-corrMat(1:size(covMat,1)+1:end) = sign(diag(corrMat));
+corr_mat = bsxfun(@rdivide, cov_mat,  sigma);
+corr_mat = bsxfun(@rdivide, corr_mat, sigma');
+t       = find(abs(corr_mat) > 1); corr_mat(t) = corr_mat(t)./abs(corr_mat(t));
+corr_mat(1:size(cov_mat,1)+1:end) = sign(diag(corr_mat));
 
 end

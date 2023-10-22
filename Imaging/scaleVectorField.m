@@ -1,4 +1,4 @@
-function v = scaleVectorField(v, factors, dimVec)
+function v = scaleVectorField(v, factors, dim_vec)
 %scaleVectorField scales the components of a multi-dimensional vector
 %field with scalar factors
 %
@@ -21,23 +21,23 @@ function v = scaleVectorField(v, factors, dimVec)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 11.01.2019
-%       last update     - 11.01.2019
+%       last update     - 16.05.2023
 %
 % See also scaleImage
 
 % check for user defined input for dimVec, otherwise assign default
 if(nargin < 3)
-   dimVec =  nDims(v);
+   dim_vec =  nDims(v);
 end
 
 
-if(length(factors) ~= size(v, dimVec))
+if(length(factors) ~= size(v, dim_vec))
    error('length of the factors must coincide with the number of vector components')
 end
 
-onesVec         = ones(1, nDims(v));
-onesVec(dimVec) = size(v, dimVec);
-factors         = reshape(factors, onesVec);
+ones_vec         = ones(1, nDims(v));
+ones_vec(dim_vec) = size(v, dim_vec);
+factors         = reshape(factors, ones_vec);
 v               = bsxfun(@times, v, factors);
 
 end

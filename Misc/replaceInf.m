@@ -1,7 +1,6 @@
 function x = replaceInf(x, value)
 %REPLACEINF is a simple function replacing every inf in an array with a given value
 %
-%
 % USAGE:
 %   x = replaceInf(x, 1)
 %

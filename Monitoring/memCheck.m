@@ -21,15 +21,15 @@ function [str, bytes] = memCheck(sz, type)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 22.02.2019
-%       last update     - 22.02.2019
+%       last update     - 16.05.2023
 %
 % See also convertBytes, mem
 
 
-numEl   = prod(sz);
-baseVar = ones(1, type);
-info    = whos('baseVar');
-bytes   = numEl * info.bytes;
-str     = convertBytes(bytes);
+num_el   = prod(sz);
+base_var = ones(1, type);
+info     = whos('base_var');
+bytes    = num_el * info.bytes;
+str      = convertBytes(bytes);
 
 end

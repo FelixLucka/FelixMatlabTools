@@ -1,4 +1,4 @@
-function [fNoisy, info] = noiseSignal(f, para)
+function [f_noisy, info] = noiseSignal(f, para)
 % NOISEDATA adds noise to a given signal 
 %
 % DETAILS:
@@ -37,46 +37,46 @@ function [fNoisy, info] = noiseSignal(f, para)
 %       
 %   
 % OUTPUTS:
-%   fNoisy  - the noisy data
+%   f_noisy  - the noisy data
 %   info    - a struct containing additional information on the noise, such
 %             as SNR, std deviation
 %
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 05.11.2018
-%       last update     - 05.11.2018
+%       last update     - 16.05.2023
 %
 % See also
 
 info   = [];
 
-noiseType = checkSetInput(para, 'noiseType', {'AdditiveGaussian', 'Poisson'}, 'AdditiveGaussian');
-amplitude = checkSetInput(para, 'amplitude', {'relativeLInf', 'relativeL2',...
+noise_type = checkSetInput(para, 'noiseType', {'AdditiveGaussian', 'Poisson'}, 'AdditiveGaussian');
+amplitude  = checkSetInput(para, 'amplitude', {'relativeLInf', 'relativeL2',...
                           'relativeSNR', 'absolute'}, 'relativeLInf');
-noiseParameter = checkSetInput(para, 'noiseParameter', '>=0', 0.1);
-rngSeed        = checkSetInput(para, 'noiseParameter', 'i,>=0', 'shuffle');
+noise_parameter = checkSetInput(para, 'noiseParameter', '>=0', 0.1);
+rngSeed         = checkSetInput(para, 'noiseParameter', 'i,>=0', 'shuffle');
 
 % get the current state of the random generator (will be set to that state
 % after adding noise)
-currRngState = rng;
+curr_rng_state = rng;
 rng(rngSeed)
 
 
-switch noiseType
+switch noise_type
     case 'AdditiveGaussian'
         
         switch amplitude
             case 'absolute'
-                sigma = noiseParameter;
+                sigma = noise_parameter;
             case 'relativeLInf'
-                sigma = noiseParameter * max(abs(f(:)));
+                sigma = noise_parameter * max(abs(f(:)));
             case 'relativeL2'
-                sigma = noiseParameter * norm(f(:));
+                sigma = noise_parameter * norm(f(:));
             case 'relativeSNR'
-                sigma = sqrt(mean(f(:).^2)) * 10^(-noiseParameter/20);
+                sigma = sqrt(mean(f(:).^2)) * 10^(-noise_parameter/20);
         end
         noise  = sigma .* randn(size(f), 'like', f);
-        fNoisy = f + noise;
+        f_noisy = f + noise;
         
         if(isscalar(sigma))
            info.sigma = sigma;
@@ -85,14 +85,14 @@ switch noiseType
         
     case 'Poisson'
         
-        fNoisy = poissrnd(f);
+        f_noisy = poissrnd(f);
         
     otherwise
         notImpErr
 end
 
 % set the internal state of the random generator to what it was before
-rng(currRngState);
+rng(curr_rng_state);
 
 
 end

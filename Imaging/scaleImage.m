@@ -1,25 +1,25 @@
-function imNew = scaleImage(im, sizeNew, para)
+function im_new = scaleImage(im, size_new, para)
 %SCALEIMAGE scales an image to a new size by interpolation
 %
 % USAGE:
-%   imNew = scaleImage([1,0;0,-1]), [3,3]) produces
+%   im_new = scaleImage([1,0;0,-1]), [3,3]) produces
 %
 % INPUTS:
 %   im - d-dim numerical array assumed in ndgrid format representing the
 %        image
-%   sizeNew  - 1 x d integer vector of the new image size
+%   size_new  - 1 x d integer vector of the new image size
 %
 % OPTIONAL INPUTS:
 %   para    - a struct containing further optional parameters:
 %       'interpolationMethod' - see interpn.m, default: linear
 %
 % OUTPUTS:
-%   imNew - resized image
+%   im_new - resized image
 %
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 28.12.2018
-%       last update     - 28.12.2018
+%       last update     - 16.05.2023
 %
 % See also warpImage, incImageRes
 
@@ -30,59 +30,59 @@ if(nargin < 3)
 end
 
 % if image is in the right size, don't do anything
-if(isequal(size(im), sizeNew))
-    imNew = im;
+if(isequal(size(im), size_new))
+    im_new = im;
     return
 end
 
 dim    = nDims(im);
-sizeIm = size(im);
-n      = prod(sizeNew);
+size_im = size(im);
+n      = prod(size_new);
 
-interpolationMethod = checkSetInput(para, 'interpolationMethod', ...
+interpolation_method = checkSetInput(para, 'interpolationMethod', ...
     {'linear', 'nearest', 'pchip', 'cubic', 'spline', 'makima', ...
     'linearMat', 'nearestMat'}, 'linear');
 
 % construct spatial grids are given, otherwise construct
 
-for iDim = 1:dim
-    gridVec{iDim}    = 1:sizeIm(iDim);
-    gridVecNew{iDim} = linspace(1,sizeIm(iDim),sizeNew(iDim));
+for i_dim = 1:dim
+    grid_vec{i_dim}     = 1:size_im(i_dim);
+    grid_vec_new{i_dim} = linspace(1,size_im(i_dim),size_new(i_dim));
 end
 
 % set up grids
-argOutStr    = '[';
-argOutStrNew = '[';
-for iDim=1:dim
-    argOutStr    = [argOutStr 'X{' int2str(iDim) '},'];
-    argOutStrNew = [argOutStrNew 'XNew{' int2str(iDim) '},'];
+arg_out_str     = '[';
+arg_out_str_new = '[';
+for i_dim=1:dim
+    arg_out_str     = [arg_out_str 'im{' int2str(i_dim) '},'];
+    arg_out_str_new = [arg_out_str_new 'im_new{' int2str(i_dim) '},'];
 end
-argOutStr    = [argOutStr(1:end-1), ']'];
-argOutStrNew = [argOutStrNew(1:end-1), ']'];
-eval([argOutStr    ' = ndgrid(gridVec{:});'])
-eval([argOutStrNew ' = ndgrid(gridVecNew{:});'])
+arg_out_str    = [arg_out_str(1:end-1), ']'];
+arg_out_str_new = [arg_out_str_new(1:end-1), ']'];
+eval([arg_out_str    ' = ndgrid(grid_vec{:});'])
+eval([arg_out_str_new ' = ndgrid(grid_vec_new{:});'])
 
 
-switch interpolationMethod
+switch interpolation_method
     case 'nearest'
         
         % compute nearest neighbour index
-        for iDim=1:dim
-            dx        = gridVec{iDim}(2) - gridVec{iDim}(1);
-            sub{iDim} = round((XNew{iDim} - gridVec{iDim}(1)) / dx + 1);
+        for i_dim=1:dim
+            dx        = grid_vec{i_dim}(2) - grid_vec{i_dim}(1);
+            sub{i_dim} = round((im_new{i_dim} - grid_vec{i_dim}(1)) / dx + 1);
         end
         
-        imNew = reshape(im(sub2ind(sizeIm, sub{:})), sizeNew);
+        im_new = reshape(im(sub2ind(size_im, sub{:})), size_new);
         
     case 'linear'
         
-        imNew = zeros(sizeNew, 'like', im);
+        im_new = zeros(size_new, 'like', im);
         
         % compute the closed neighbours in negative direction and distance towards them
-        for iDim=1:dim
-            dx        = gridVec{iDim}(2) - gridVec{iDim}(1);
-            sub{iDim} = floor((XNew{iDim} - gridVec{iDim}(1)) / dx + 1);
-            l{iDim}   = vec(XNew{iDim} - gridVec{iDim}(sub{iDim}));
+        for i_dim=1:dim
+            dx        = grid_vec{i_dim}(2) - grid_vec{i_dim}(1);
+            sub{i_dim} = floor((XNew{i_dim} - grid_vec{i_dim}(1)) / dx + 1);
+            l{i_dim}   = vec(XNew{i_dim} - grid_vec{i_dim}(sub{i_dim}));
         end
         
         % C encodes all vertices
@@ -92,34 +92,34 @@ switch interpolationMethod
         for iC=1:size(C,1)
             subC = sub;
             weights = ones(n, 1);
-            for iDim=1:dim
-                if(C(iC, iDim)) % vertex in positiv direction
-                    weights = weights .* l{iDim};
-                    subC{iDim} = subC{iDim} + 1;
+            for i_dim=1:dim
+                if(C(iC, i_dim)) % vertex in positiv direction
+                    weights = weights .* l{i_dim};
+                    subC{i_dim} = subC{i_dim} + 1;
                 else % vertex in negative direction
-                    weights    = weights .* (1-l{iDim});
+                    weights    = weights .* (1-l{i_dim});
                 end
             end
             
             % find vertices with non-zeros weights
             nzW = weights > 0;
-            for iDim=1:dim
-                subC{iDim} = subC{iDim}(nzW);
+            for i_dim=1:dim
+                subC{i_dim} = subC{i_dim}(nzW);
             end
-            ind = sub2ind(sizeIm, subC{:});
+            ind = sub2ind(size_im, subC{:});
             
             % add weighted image intensities
-            imNew(nzW) = imNew(nzW) + weights(nzW) .* im(ind);
+            im_new(nzW) = im_new(nzW) + weights(nzW) .* im(ind);
         end
         
     otherwise
         
-        if(strcmp(interpolationMethod(end-2:end), 'Mat'))
-            interpolationMethod = interpolationMethod(1:end-3);
+        if(strcmp(interpolation_method(end-2:end), 'Mat'))
+            interpolation_method = interpolation_method(1:end-3);
         end
         
-        F = griddedInterpolant(X{:}, im, interpolationMethod, 'none');
-        imNew = F(XNew{:});
+        F = griddedInterpolant(X{:}, im, interpolation_method, 'none');
+        im_new = F(XNew{:});
 end
 
 

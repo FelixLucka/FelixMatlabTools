@@ -20,7 +20,7 @@ function y = ifElseFncHndl(a, x, f, g)
 %       date            - 23.04.2020
 %       last update     - 23.04.2020
 %
-% See also
+% See also ifElseFnc
 
 if(a)
     y = f(x);

@@ -1,4 +1,4 @@
-function [linesStructs, values] = extractContourLines(C)
+function [lines_structs, values] = extractContourLines(C)
 %EXTRACTCONTOURLINES extracts the countour lines from the contour matrix
 % retruned by contour.m
 %
@@ -21,23 +21,23 @@ function [linesStructs, values] = extractContourLines(C)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 05.11.2018
-%       last update     - 05.11.2018
+%       last update     - 14.10.2023
 %
 % See also contour
 
-linesStructs  = [];
-N_lines = 0;
+lines_structs  = [];
+n_lines = 0;
 
 while(~isempty(C))
-    N_lines = N_lines + 1;
+    n_lines = n_lines + 1;
     % extract the next line
-    linesStructs(N_lines).val = C(1,1);
-    values(N_lines) = C(1,1);
-    linesStructs(N_lines).nPoints = C(2,1);
+    lines_structs(n_lines).val = C(1,1);
+    values(n_lines) = C(1,1);
+    lines_structs(n_lines).n_noints = C(2,1);
     C(:,1) = [];
-    linesStructs(N_lines).x = C(1,1:linesStructs(N_lines).nPoints);
-    linesStructs(N_lines).y = C(2,1:linesStructs(N_lines).nPoints);
-    C(:,1:linesStructs(N_lines).nPoints) = [];
+    lines_structs(n_lines).x = C(1,1:lines_structs(n_lines).n_noints);
+    lines_structs(n_lines).y = C(2,1:lines_structs(n_lines).n_noints);
+    C(:,1:lines_structs(n_lines).n_noints) = [];
 end
 
 values = unique(values);

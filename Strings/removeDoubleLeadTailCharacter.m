@@ -21,7 +21,7 @@ function str = removeDoubleLeadTailCharacter(str,character)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 10.03.2018
-%       last update     - 10.03.2018
+%       last update     - 16.05.2023
 %
 % See also removeDoubleCharacter, removeLeadTailCharacter
 

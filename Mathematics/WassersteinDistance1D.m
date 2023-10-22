@@ -1,4 +1,4 @@
-function [W, gradfW, f2gFlow] = WassersteinDistance1D(f, g, para)
+function [W, grad_f_W, f2g_flow] = WassersteinDistance1D(f, g, para)
 % WassersteinDistance1D computes the Wasserstein Distance between two 1D
 % functions and the gradient of the squared Wasserstein Distance
 %
@@ -30,7 +30,7 @@ function [W, gradfW, f2gFlow] = WassersteinDistance1D(f, g, para)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 02.02.2019
-%       last update     - 02.02.2019
+%       last update     - 16.05.2023
 %
 % See also
 
@@ -41,9 +41,9 @@ end
 
 % spatial grids
 n     = length(f);
-tGrid = checkSetInput(para, 'tGrid', 'numeric', 1:n);
-tStart = tGrid(1);
-dt     = tGrid(2) - tGrid(1);
+t_grid = checkSetInput(para, 'tGrid', 'numeric', 1:n);
+t_start = t_grid(1);
+dt     = t_grid(2) - t_grid(1);
 
 transform = checkSetInput(para, 'transform', {'norm', 'shiftNorm', 'yang'}, 'yang');
 fac       = 1;
@@ -62,10 +62,10 @@ switch transform
         fac = 1 .* f_sign + exp(c * f) .* not(f_sign);
         g   = (g + 1/c) .* (g >= 0) + 1/c * exp(c * g) .* (g < 0);
 end
-fShift = f;
-Nf     = sum(f);
-f      = f / Nf;
-g      = g / sum(g);
+f_shift = f;
+n_f     = sum(f);
+f       = f / n_f;
+g       = g / sum(g);
 
 
 
@@ -89,32 +89,32 @@ G(end)  = 1;
 % GInvHelp = @(y, i) ((y - G(i-1)) / (G(i) - G(i-1))) * dt + tGrid(i-1);
 % GInvFun  = @(y) GInvHelp(y, y2i(y));
 
-GInvF = zeros(1, n);
+G_inv_F = zeros(1, n);
 ind = 2;
-for i=1:length(tGrid)
+for i=1:length(t_grid)
     %GInvF(i) = GInvFun(F(i));
     y = F(i);
     while(G(ind) < y)
         ind = ind + 1;
     end
-    GInvF(i) = ((y - G(ind-1)) / (G(ind) - G(ind-1))) * dt + tGrid(ind-1);
+    G_inv_F(i) = ((y - G(ind-1)) / (G(ind) - G(ind-1))) * dt + t_grid(ind-1);
 end
 
 
 % simple integration
-W = sqrt(sum((tGrid - GInvF).^2 .* f));
+W = sqrt(sum((t_grid - G_inv_F).^2 .* f));
 
 if(nargout > 1)
     
     % compute analytical gradient wrt to f
-    gGInvF                    = interp1(tGrid, g, GInvF);
-    fOverFGInvF               = f./interp1(tGrid, g, GInvF);
-    fOverFGInvF(gGInvF < eps) = 0;
-    revIntegal = cumsum(fOverFGInvF .* (tGrid - GInvF), 2, 'reverse') * dt;
-    gradfW  = -2 * revIntegal + (tGrid - GInvF).^2;
+    g_G_inv_F                    = interp1(t_grid, g, G_inv_F);
+    f_over_FG_inv_F               = f./interp1(t_grid, g, G_inv_F);
+    f_over_FG_inv_F(g_G_inv_F < eps) = 0;
+    rev_integal = cumsum(f_over_FG_inv_F .* (t_grid - G_inv_F), 2, 'reverse') * dt;
+    grad_f_W  = -2 * rev_integal + (t_grid - G_inv_F).^2;
     
     % apply transpose of Jakobian of transform
-    gradfW = multWithTransposeJac(gradfW);
+    grad_f_W = multWithTransposeJac(grad_f_W);
     
 end
 
@@ -122,19 +122,19 @@ if(nargout > 2)
     
     % compute flow from f to g
     delta = checkSetInput(para, 'delta', '>0', 10^-2);
-    fTrans = interp1(tGrid, g, (1-delta) * GInvF + delta * tGrid);
-    f2gFlow = fTrans - f;
+    f_trans = interp1(t_grid, g, (1-delta) * G_inv_F + delta * t_grid);
+    f2g_flow = f_trans - f;
     
     % apply transpose of Jakobian of transform
-    f2gFlow = multWithTransposeJac(f2gFlow);
+    f2g_flow = multWithTransposeJac(f2g_flow);
     
 end
 
 
 
     function y = multWithTransposeJac(x)
-        y = fShift.*x/Nf^2;
-        y = fac.*x/Nf - fac * sum(y(:));
+        y = f_shift.*x/n_f^2;
+        y = fac.*x/n_f - fac * sum(y(:));
     end
 
 end

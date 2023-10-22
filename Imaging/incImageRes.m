@@ -1,4 +1,4 @@
-function newIm = incImageRes(im, res)
+function im_new = incImageRes(im, res)
 %INCIMAGERES increases the resolution of an image by cloning pixels (no
 %interpolation) 
 %
@@ -22,7 +22,7 @@ function newIm = incImageRes(im, res)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 01.11.2018
-%       last update     - 01.11.2018
+%       last update     - 05.09.2023
 %
 % See also scaleImage
 
@@ -37,9 +37,9 @@ for i=1:res(1)
     im_incX(i:res(1):end,:) = im;
 end
 
-newIm = zeros(m*res(1),n*res(2), 'like', im);
+im_new = zeros(m*res(1),n*res(2), 'like', im);
 for j=1:res(2)
-    newIm(:,j:res(2):end) = im_incX; 
+    im_new(:,j:res(2):end) = im_incX; 
 end
 
 end

@@ -1,4 +1,4 @@
-function NcharNew =  rewindAndPrint(str, NcharOld)
+function n_char_new =  rewindAndPrint(str, n_char_old)
 %REWINDANDPRINT overwrites old outout in the command window by new one
 %
 % DESCRIPTION:
@@ -6,37 +6,37 @@ function NcharNew =  rewindAndPrint(str, NcharOld)
 %   it instead of simply printing new output
 %
 % USAGE:
-%   NcharNew =  rewindAndPrint('It is 9pm', 0)
-%   NcharNew =  rewindAndPrint('It is 10pm',NcharNew)
+%   n_char_new =  rewindAndPrint('It is 9pm', 0)
+%   n_char_new =  rewindAndPrint('It is 10pm', n_char_new)
 %
 % INPUT:
 %   str        - string to display
-%   'NcharOld' - number of places to delete before starting to write
+%   n_char_old - number of places to delete before starting to write
 %
 % OUTPUTS:
-%   NcharNew  - length of the printed string
+%   n_char_new - length of the printed string
 %
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 03.11.2018
-%       last update     - 03.11.2018
+%       last update     - 24.09.2023
 %
 % See also dispBlanc
 
-backStr = '';
-for j=1:NcharOld
-    backStr = [backStr '\x08'];
+back_str = '';
+for j=1:n_char_old
+    back_str = [back_str '\x08'];
 end
 
 if(~isempty(str))
-    NcharNew = fprintf(backStr);
-    NcharNew = NcharNew + fprintf(str);
-    NcharNew = NcharNew - NcharOld;
+    n_char_new = fprintf(back_str);
+    n_char_new = n_char_new + fprintf(str);
+    n_char_new = n_char_new - n_char_old;
     %fprintf('\n')
     %NcharNew = NcharNew +1;
 else
-    fprintf(backStr)
-    NcharNew = 0;
+    fprintf(back_str)
+    n_char_new = 0;
 end
 drawnow();
 

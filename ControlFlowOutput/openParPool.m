@@ -1,4 +1,4 @@
-function pp = openParPool(nWorkerPool, output, deleteExistingPool)
+function pp = openParPool(n_worker_pool, output, delete_existing_pool)
 % OPENPARPOOL safely opens a parallel pool with a specified number of
 % workers, without throwing all the warnings. 
 %
@@ -11,11 +11,11 @@ function pp = openParPool(nWorkerPool, output, deleteExistingPool)
 %   pp = openParPool(10, true)
 %
 % INPUTS:
-%   nWorkerPool - number of workers
+%   n_worker_pool - number of workers
 %   output      - logical indicating whether output should be displayed.
 %
 % OPTIONAL INPUTS: 
-%   deleteExistingPool - a logical indicating whether existing par pools 
+%   delete_existing_pool - a logical indicating whether existing par pools 
 %                        should be closed, even if they match the number of
 %                        requested workers
 %
@@ -31,18 +31,18 @@ function pp = openParPool(nWorkerPool, output, deleteExistingPool)
 
 % check user defined value for deleteExistingPoolFL, otherwise assign default value
 if(nargin < 3)
-    deleteExistingPool = true;
+    delete_existing_pool = true;
 end
 
 % check whether another pool is open and delete it if it does not match the
 % number of requested workers
 pp = gcp('nocreate');
 if(~isempty(pp))
-    if(deleteExistingPool)
+    if(delete_existing_pool)
         evalc('delete(gcp)');
     else
-        nWorkerCurrentPool = pp.NumWorkers;
-        if(nWorkerCurrentPool == nWorkerPool)
+        n_worker_current_pool = pp.NumWorkers;
+        if(n_worker_current_pool == n_worker_pool)
             % don't do anything
            return 
         else
@@ -54,9 +54,9 @@ end
 % open new pool
 warning off all
 if(output)
-    eval(['pp = parpool(''local'',' int2str(nWorkerPool) ');']);
+    eval(['pp = parpool(''local'',' int2str(n_worker_pool) ');']);
 else
-    evalc(['pp = parpool(''local'',' int2str(nWorkerPool) ');']);
+    evalc(['pp = parpool(''local'',' int2str(n_worker_pool) ');']);
 end
 warning on all
 

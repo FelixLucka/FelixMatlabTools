@@ -1,4 +1,4 @@
-function im2d = merge1dImages(folder, pattern, mergeDir, mergeFileName, delete1d)
+function im2d = merge1dImages(folder, pattern, merge_dir, merge_file_name, delete1d)
 %MERGE1DIMAGES merges a stack of 1d images files into a 2d image file
 %
 % DESCRIPTION:
@@ -7,25 +7,19 @@ function im2d = merge1dImages(folder, pattern, mergeDir, mergeFileName, delete1d
 %   projections for the single angles
 %
 % USAGE:
-%   im2d = merge1dImages(folder, pattern, mergeDir, mergeFileName, delete1d)
+%   im2d = merge1dImages(folder, pattern, merge_dir, merge_file_name, delete1d)
 %
 % INPUTS:
 %   folder  - path to folder
 %   pattern - search pattern to find the 1d images files to merge
-%   mergeDir      - direction in which the 1d files should be
-%                   conecated; 1 or 2 (default)
-%   mergeFileName - name of the file in which the 2d images is saved (leave
-%                   empty if it should not be safed
-%   delete1d      - bool indicating whether the 1d image files should be
-%                   deleted after printing
 %
 % OPTIONAL INPUTS:
 %   mergeDir      - direction in which the 1d files should be
 %                   conecated; 1 or 2 (default)
-%   mergeFileName - name of the file in which the 2d images is saved (leave
-%                   empty if it should not be safed, default = [])
+%   merge_file_name - name of the file in which the 2d images is saved (leave
+%                   empty if it should not be safed
 %   delete1d      - bool indicating whether the 1d image files should be
-%                   deleted after printing (default: false)
+%                   deleted after printing
 %
 % OUTPUTS:
 %   im2d - the merged 2d image
@@ -33,18 +27,18 @@ function im2d = merge1dImages(folder, pattern, mergeDir, mergeFileName, delete1d
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 27.08.2018
-%       last update     - 27.08.2018
+%       last update     - 05.09.2023
 %
 % See also
 
-% check user defined value for z, otherwise assign default value
+% check user defined value for merge_dir, otherwise assign default value
 if(nargin < 3)
-    mergeDir = 2;
+    merge_dir = 2;
 end
 
-% check user defined value for mergeFileName, otherwise assign default value
+% check user defined value for merge_file_name, otherwise assign default value
 if(nargin < 4)
-    mergeFileName = [];
+    merge_file_name = [];
 end
 
 % check user defined value for delete1d, otherwise assign default value
@@ -53,14 +47,14 @@ if(nargin < 5)
 end
 
 % get all files
-im1dFiles = dir([folder pattern]);
-if(isempty(im1dFiles))
+im1d_files = dir([folder pattern]);
+if(isempty(im1d_files))
     error(['search for ''' folder pattern ''' did not return any results' ]);
 end
 
 % get dimensions of the image data
-n   = length(im1dFiles);
-ref = imread([folder im1dFiles(1).name]);
+n   = length(im1d_files);
+ref = imread([folder im1d_files(1).name]);
 if(~isvector(ref))
     error('image data is not a single row or column')
 end
@@ -70,23 +64,23 @@ m   = length(ref(:));
 im2d = zeros(m, n, 'like', ref);
 
 for i = 1:n
-    im2d(:, i) = imread([folder im1dFiles(i).name]);
+    im2d(:, i) = imread([folder im1d_files(i).name]);
 end
 
 % flip direction
-if(mergeDir == 1)
+if(merge_dir == 1)
     im2d = im2d';
 end
 
-if(~isempty(mergeFileName))
+if(~isempty(merge_file_name))
     
     % print merged image
-    imwrite(im2d, [folder mergeFileName]);
+    imwrite(im2d, [folder merge_file_name]);
     
     % delete single tif files
     if(delete1d)
         for i = 1:n
-            delete([folder im1dFiles(i).name]);
+            delete([folder im1d_files(i).name]);
         end
     end
     

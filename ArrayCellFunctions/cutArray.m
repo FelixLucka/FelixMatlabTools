@@ -1,8 +1,8 @@
-function A = cutArray(A, cutSize, dir)
+function A = cutArray(A, cut_size, dir)
 %CUTARRAY clips margins of an array
 %
 % DESCRIPTION:
-%       cutArray is the reverse of myPadarray, it clips of columns and rows
+%       cutArray is the reverse of padArray, it clips of columns and rows
 %       at the boundary of arrays
 %
 % USAGE:
@@ -12,7 +12,7 @@ function A = cutArray(A, cutSize, dir)
 %
 % INPUTS:
 %       A       - up to 4-dim array
-%       cutSize - a vector specifying how many layers to cut away
+%       cut_size - a vector specifying how many layers to cut away
 %       dir     - direction in which to cut, can be 'both' for beginning and
 %             end, 'pre' for only at the beginning and 'post' for only at the end
 %
@@ -22,7 +22,7 @@ function A = cutArray(A, cutSize, dir)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 03.09.2017
-%       last update     - 05.04.2018
+%       last update     - 24.09.2023
 %
 % See also padArray
 
@@ -30,16 +30,16 @@ function A = cutArray(A, cutSize, dir)
 if(isvector(A))
     
     % A is a vector
-    if(length(cutSize) > 1)
-        cutSize = max(cutSize);
+    if(length(cut_size) > 1)
+        cut_size = max(cut_size);
     end
     switch dir
         case 'both'
-            A = A((cutSize+1):(end-cutSize));
+            A = A((cut_size+1):(end-cut_size));
         case 'pre'
-            A = A((cutSize+1):end);
+            A = A((cut_size+1):end);
         case 'post'
-            A = A(1:(end-cutSize));
+            A = A(1:(end-cut_size));
         otherwise
             error('invalid choise for ''dir''')
     end
@@ -51,34 +51,34 @@ else
         case 2
             switch dir
                 case 'both'
-                    A = A((cutSize(1)+1):(end-cutSize(1)),(cutSize(2)+1):(end-cutSize(2)));
+                    A = A((cut_size(1)+1):(end-cut_size(1)),(cut_size(2)+1):(end-cut_size(2)));
                 case 'pre'
-                    A = A((cutSize(1)+1):end,(cutSize(2)+1):end);
+                    A = A((cut_size(1)+1):end,(cut_size(2)+1):end);
                 case 'post'
-                    A = A(1:(end-cutSize(1)),1:(end-cutSize(2)));
+                    A = A(1:(end-cut_size(1)),1:(end-cut_size(2)));
                 otherwise
                     error('invalid choise for ''dir''')
             end
         case 3
             switch dir
                 case 'both'
-                    A = A((cutSize(1)+1):(end-cutSize(1)),(cutSize(2)+1):(end-cutSize(2)),(cutSize(3)+1):(end-cutSize(3)));
+                    A = A((cut_size(1)+1):(end-cut_size(1)),(cut_size(2)+1):(end-cut_size(2)),(cut_size(3)+1):(end-cut_size(3)));
                 case 'pre'
-                    A = A((cutSize(1)+1):end,(cutSize(2)+1):end,(cutSize(3)+1):end);
+                    A = A((cut_size(1)+1):end,(cut_size(2)+1):end,(cut_size(3)+1):end);
                 case 'post'
-                    A = A(1:(end-cutSize(1)),1:(end-cutSize(2)),1:(end-cutSize(3)));
+                    A = A(1:(end-cut_size(1)),1:(end-cut_size(2)),1:(end-cut_size(3)));
                 otherwise
                     error('invalid choise for ''dir''')
             end
         case 4
             switch dir
                 case 'both'
-                    A = A((cutSize(1)+1):(end-cutSize(1)),(cutSize(2)+1):(end-cutSize(2)),...
-                        (cutSize(3)+1):(end-cutSize(3)),(cutSize(4)+1):(end-cutSize(4)));
+                    A = A((cut_size(1)+1):(end-cut_size(1)),(cut_size(2)+1):(end-cut_size(2)),...
+                        (cut_size(3)+1):(end-cut_size(3)),(cut_size(4)+1):(end-cut_size(4)));
                 case 'pre'
-                    A = A((cutSize(1)+1):end,(cutSize(2)+1):end,(cutSize(3)+1):end,(cutSize(4)+1):end);
+                    A = A((cut_size(1)+1):end,(cut_size(2)+1):end,(cut_size(3)+1):end,(cut_size(4)+1):end);
                 case 'post'
-                    A = A(1:(end-cutSize(1)),1:(end-cutSize(2)),1:(end-cutSize(3)),1:(end-cutSize(4)));
+                    A = A(1:(end-cut_size(1)),1:(end-cut_size(2)),1:(end-cut_size(3)),1:(end-cut_size(4)));
                 otherwise
                     error('invalid choise for ''dir''')
             end

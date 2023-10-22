@@ -1,4 +1,4 @@
-function trackMemoryUsage(pid, updateInt, logTxt, logMat)
+function trackMemoryUsage(pid, update_int, log_txt, log_mat)
 %TRACKMEMORYUSAGE can be used to track the memory consumption of an
 %external process (UNIX ONLY!)
 %
@@ -19,30 +19,30 @@ function trackMemoryUsage(pid, updateInt, logTxt, logMat)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 01.11.2018
-%       last update     - 01.11.2018
+%       last update     - 16.05.2023
 %
 % See also mem, memCheck
 
 checkUnix(trackMemoryUsage)
 
-tInt = 0;
-fid = fopen(logTxt, 'w');
+t_int = 0;
+fid  = fopen(log_txt, 'w');
 
 while(1)
-    pause(updateInt)
+    pause(update_int)
     
-    tInt = tInt+1;
-    t(tInt) = tInt*updateInt;
+    t_int = t_int+1;
+    t(t_int) = t_int*update_int;
     
     [stat out] = system(['pmap -x ' int2str(pid) ' | grep ''total''']);
     aux = str2num(out(11:end));
-    mem_GByte(tInt) = aux(1)/1048576;
+    mem_GByte(t_int) = aux(1)/1048576;
     
-    save(logMat,'t','mem_GByte');
+    save(log_mat,'t','mem_GByte');
     
     % write something to file
-    filestr = [datestr(clock) '     ' num2str(mem_GByte(tInt)) ' GB'];
-    fprintf(fid, '%s\n',filestr);
+    file_str = [datestr(clock) '     ' num2str(mem_GByte(t_int)) ' GB'];
+    fprintf(fid, '%s\n',file_str);
 end
 
 fclose(fid);

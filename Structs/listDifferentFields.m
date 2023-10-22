@@ -2,7 +2,7 @@ function listDifferentFields(struct1, name1, struct2, name2)
 %LISTDIFFERENTFIELDS lists the field names that two structs don't share
 %
 % DESCRIPTION: 
-%   functionTemplate.m can be used to display the fields that two structs
+%   listDifferentFields.m can be used to display the fields that two structs
 %   do not have in common
 %
 % USAGE:
@@ -22,14 +22,14 @@ function listDifferentFields(struct1, name1, struct2, name2)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 05.11.2018
-%       last update     - 05.11.2018
+%       last update     - 16.05.2023
 %
 % See also compareStructs, enforceFields, mergeStructs
 
 struct1 = orderfields(struct1);
 struct2 = orderfields(struct2);
-fn1 = fieldnames(struct1);
-fn2 = fieldnames(struct2);
+fn1     = fieldnames(struct1);
+fn2     = fieldnames(struct2);
 if(~isequal(fn1,fn2))
     for i=1:length(fn1)
         is_in = false;

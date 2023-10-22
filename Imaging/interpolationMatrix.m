@@ -1,4 +1,4 @@
-function I = interpolationMatrix(gridVec, Xq, para)
+function I = interpolationMatrix(grid_vec, X_q, para)
 %INTERPOLATIONMATRIX sets up a sparse matrix to interpolate from a regular grid 
 % to a set of query points
 %
@@ -6,11 +6,11 @@ function I = interpolationMatrix(gridVec, Xq, para)
 %   ToDo
 %
 % USAGE:
-%   I = interpolationMatrix(gridVec, Xq, para)
+%   I = interpolationMatrix(grid_vec, X_q, para)
 %
 % INPUTS:
-%   gridVec  - cell of grid vectors
-%   Xq       - n x dim array of query points
+%   grid_vec - cell of grid vectors
+%   X_q      - n x dim array of query points
 %
 % OPTIONAL INPUTS:
 %   para - a struct containing further optional parameters:
@@ -19,7 +19,7 @@ function I = interpolationMatrix(gridVec, Xq, para)
 %       set to 0
 %
 %   WARNING: interpolationMatrix.m only works with grids that are equidistantly
-%   spaced in each direction (although dx might differ from dy)!!!
+%   spaced in each direction (although dx might differ from dy/dz)!!!
 %
 % OUTPUTS:
 %   I - sparse matrix that maps a function defined on the regular grid x 
@@ -28,7 +28,7 @@ function I = interpolationMatrix(gridVec, Xq, para)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 10.11.2019
-%       last update     - 10.11.2019
+%       last update     - 05.09.2023
 %
 % See also ndgrid
 
@@ -37,81 +37,86 @@ if(nargin < 3)
     para = [];
 end
 
-dim    = length(gridVec);
-sizeIm = cellfun(@length, gridVec);
-m      = prod(sizeIm);
-n      = size(Xq, 1);
+% get sizes and dimensions
+dim     = length(grid_vec);
+size_im = cellfun(@length, grid_vec);
+m       = prod(size_im);
+n       = size(X_q, 1);
 
 
-interpolationMethod = checkSetInput(para, 'interpolationMethod', ...
-    {'linear', 'nearest'}, 'linear');
-tol              = checkSetInput(para, 'tol', '>0', 0);
+interpolation_method = checkSetInput(para, 'interpolationMethod', ...
+                                    {'linear', 'nearest'}, 'linear');
+tol                  = checkSetInput(para, 'tol', '>0', 0);
 
 % check that all query points lie within the grid
-for iDim=1:dim
-    if(min(Xq(:,iDim)) < gridVec{iDim}(1) || max(Xq(:,iDim)) > gridVec{iDim}(end))
+for i_dim=1:dim
+    if(min(X_q(:,i_dim)) < grid_vec{i_dim}(1) || max(X_q(:,i_dim)) > grid_vec{i_dim}(end))
         error('query points Xq lie outside of defined grid X')
     end
 end
 
 
-switch interpolationMethod
+switch interpolation_method
+
+    %%% nearest neighbour interpolation
     case 'nearest'
-        for iDim=1:dim
-            dx        = gridVec{iDim}(2) - gridVec{iDim}(1);
-            ind{iDim} = round((Xq(:,iDim) - gridVec{iDim}(1)) / dx + 1);
+        for i_dim=1:dim
+            dx        = grid_vec{i_dim}(2) - grid_vec{i_dim}(1);
+            ind{i_dim} = round((X_q(:,i_dim) - grid_vec{i_dim}(1)) / dx + 1);
         end
         if(dim > 1)
-            jInd = vec(sub2ind(sizeIm, ind{:}));
+            j_ind = vec(sub2ind(size_im, ind{:}));
         else
-            jInd = ind{:};
+            j_ind = ind{:};
         end
-        iInd = (1:n)';
-        wVal = ones(n,1);
+        i_ind = (1:n)';
+        w_val = ones(n,1);
+
+    %%% linear interpolation
     case 'linear'
         
         % compute the closed neighbours in negative direction and distance towards them
-        for iDim=1:dim
-            dx        = gridVec{iDim}(2)   - gridVec{iDim}(1);
-            sub{iDim} = floor((Xq(:,iDim) - gridVec{iDim}(1)) / dx + 1);
-            l{iDim}   = (Xq(:,iDim) - gridVec{iDim}(sub{iDim})) / dx;
+        for i_dim=1:dim
+            dx        = grid_vec{i_dim}(2)   - grid_vec{i_dim}(1);
+            sub{i_dim} = floor((X_q(:,i_dim) - grid_vec{i_dim}(1)) / dx + 1);
+            l{i_dim}   = (X_q(:,i_dim) - grid_vec{i_dim}(sub{i_dim})) / dx;
         end
         
         % C encodes all vertices
-        C  = binaryTable(dim);
-        nC = size(C,1);
+        C   = binaryTable(dim);
+        n_C = size(C,1);
         
-        iInd = [];
-        jInd = [];
-        wVal = [];
+        i_ind = [];
+        j_ind = [];
+        w_val = [];
         
         % compute weights
-        for iC=1:nC
-            subC = sub;
+        for iC=1:n_C
+            sub_C   = sub;
             weights = ones(n, 1);
-            for iDim=1:dim
-                if(C(iC, iDim)) % vertex in positiv direction
-                    weights = weights .* l{iDim};
-                    subC{iDim} = subC{iDim} + 1;
+            for i_dim=1:dim
+                if(C(iC, i_dim)) % vertex in positiv direction
+                    weights = weights .* l{i_dim};
+                    sub_C{i_dim} = sub_C{i_dim} + 1;
                 else % vertex in negative direction
-                    weights    = weights .* (1-l{iDim});
+                    weights    = weights .* (1-l{i_dim});
                 end
             end
             
             % find vertices with non-zeros weights
             nzW = weights > 0;
-            for iDim=1:dim
-                subC{iDim} = subC{iDim}(nzW);
+            for i_dim=1:dim
+                sub_C{i_dim} = sub_C{i_dim}(nzW);
             end
             if(dim > 1)
-                ind = sub2ind(sizeIm, subC{:});
+                ind = sub2ind(size_im, sub_C{:});
             else
-                ind =  subC{:};
+                ind =  sub_C{:};
             end
             
-            iInd = [iInd; find(nzW)];
-            jInd = [jInd; ind];
-            wVal = [wVal; weights(nzW)];
+            i_ind = [i_ind; find(nzW)];
+            j_ind = [j_ind; ind];
+            w_val = [w_val; weights(nzW)];
         end
         
     otherwise
@@ -120,12 +125,12 @@ end
 
 % set small weights to 0
 if(tol)
-    keep = abs(wVal) > tol;
-    iInd = iInd(keep);
-    jInd = jInd(keep);
-    wVal = wVal(keep);
+    keep = abs(w_val) > tol;
+    i_ind = i_ind(keep);
+    j_ind = j_ind(keep);
+    w_val = w_val(keep);
 end
 
-I = sparse(iInd, jInd, wVal, n, m);
+I = sparse(i_ind, j_ind, w_val, n, m);
 
 end

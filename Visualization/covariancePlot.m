@@ -1,4 +1,4 @@
-function RGB = covariancePlot(covMat, para)
+function RGB = covariancePlot(cov_mat, para)
 %COVARIANCEPLOT plots a covariance matrix (or its correlation matrix)
 %
 % USAGE:
@@ -12,12 +12,12 @@ function RGB = covariancePlot(covMat, para)
 %       'plotType' - 'cov' or 'corr' determining 
 %
 % OUTPUTS:
-%   RGB - n x n x 3 RGB image of the plot
+%   rgb - n x n x 3 RGB image of the plot
 %
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 05.11.2018
-%       last update     - 05.11.2018
+%       last update     - 14.10.2023
 %
 % See also cov2corr
 
@@ -27,25 +27,25 @@ if(nargin < 2)
 end
 
 % check if correlation matrix instead of covariance matrix shall be plotted
-plotCorr = checkSetInput(para,'plotCorr', 'logical', false);
-if(plotCorr)
-    covMat = cov2corr(covMat);
+plot_corr = checkSetInput(para,'plotCorr', 'logical', false);
+if(plot_corr)
+    cov_mat = cov2corr(cov_mat);
 end
 
-[axisH, ~] = assignOrCreateAxisHandle(para);
+[axis_h, ~] = assignOrCreateAxisHandle(para);
 
 % convert to RGB
 para.colormap = checkSetInput(para, 'colorMap', 'mixed', 'blue2red');
-[RGB, clim]   = data2RGB(covMat, para);
+[RGB, clim]   = data2RGB(cov_mat, para);
 
-image(RGB,'Parent', axisH);
+image(RGB,'Parent', axis_h);
 
 % set plot box and data aspect ratios
-PlotBoxAspectRatio = checkSetInput(para,'PlotBoxAspectRatio', 'double', [1 1 1]);
-DataAspectRatio    = checkSetInput(para,'DataAspectRatio', 'double', PlotBoxAspectRatio);
-set(axisH, 'DataAspectRatio', DataAspectRatio, ...
-           'PlotBoxAspectRatio', PlotBoxAspectRatio, 'CLim', clim);
-box(axisH, 'on'); hold(axisH, 'all');
+box_aspect_ratio  = checkSetInput(para,'PlotBoxAspectRatio', 'double', [1 1 1]);
+data_aspect_ratio = checkSetInput(para,'DataAspectRatio', 'double', box_aspect_ratio);
+set(axis_h, 'DataAspectRatio', data_aspect_ratio, ...
+           'PlotBoxAspectRatio', box_aspect_ratio, 'CLim', clim);
+box(axis_h, 'on'); hold(axis_h, 'all');
 
 % print image
 print   = checkSetInput(para,'print','logical',false);
@@ -55,4 +55,3 @@ if(print)
 end
 
 end
-

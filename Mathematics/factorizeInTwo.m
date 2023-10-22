@@ -19,39 +19,39 @@ function [a, b]  = factorizeInTwo(c)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 01.11.2018
-%       last update     - 01.11.2018
+%       last update     - 16.05.2023
 %
 % See also
 
-primeFactors = factor(c);
-nFac         = length(primeFactors);
+prime_factors = factor(c);
+nFac          = length(prime_factors);
 
 %factors that make up the first factor
-I_best    = (rand(nFac,1)<0.5);
-minMisfit = abs(prod(primeFactors(I_best))-prod(primeFactors(~I_best)));
-change    = 1;
-rep       = 1000;
+I_best     = (rand(nFac,1)<0.5);
+min_misfit = abs(prod(prime_factors(I_best))-prod(prime_factors(~I_best)));
+change     = 1;
+rep        = 1000;
 
 while(change)
-    if(minMisfit == 0)
+    if(min_misfit == 0)
         break
     end
     change = 0;
     for i=1:rep
         I      = (rand(nFac,1)<0.5);
-        misfit = abs(prod(primeFactors(I))-prod(primeFactors(~I)));
-        if(misfit < minMisfit)
+        misfit = abs(prod(prime_factors(I))-prod(prime_factors(~I)));
+        if(misfit < min_misfit)
             I_best = I;
             change = 1;
-            minMisfit = misfit;
-            if(minMisfit == 0)
+            min_misfit = misfit;
+            if(min_misfit == 0)
                 break
             end
         end
     end
 end
 
-aux = [prod(primeFactors(I_best)), prod(primeFactors(~I_best))];
+aux = [prod(prime_factors(I_best)), prod(prime_factors(~I_best))];
 a = min(aux);
 b = max(aux);
 

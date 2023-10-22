@@ -38,7 +38,7 @@ function [clim, scaling]  = determineClim(data, para)
 % ABOUT:
 %   author          - Felix Lucka
 %   date            - 13.12.2017
-%   last update     - 05.11.2018
+%   last update     - 14.10.2023
 %
 % See also data2RGB
 
@@ -63,8 +63,8 @@ else
 end
     
 % check for vector valued data
-dataType = checkSetInput(para, 'dataType', {'scalar', 'vector', '2dim'}, 'scalar');
-switch dataType
+data_type = checkSetInput(para, 'dataType', {'scalar', 'vector', '2dim'}, 'scalar');
+switch data_type
     case 'vector'
     % reduce to amplidute of the vectors
     data      = sqrt(sum(data.^2, ndims(data)));
@@ -79,33 +79,33 @@ switch dataType
 end
 
 % check for histCutOff, NonNeg and noShift
-histCutOff = checkSetInput(para, 'histCutOff', '>=0', 0);
-nonNeg     = checkSetInput(para, 'nonNeg', 'logical', false);
-noShift    = checkSetInput(para, 'noShift', 'logical', false);
+hist_cutoff = checkSetInput(para, 'histCutOff', '>=0', 0);
+non_neg     = checkSetInput(para, 'nonNeg', 'logical', false);
+no_shift    = checkSetInput(para, 'noShift', 'logical', false);
 
 % check for negative data
-if(nonNeg && any(data(:) < -eps))
+if(non_neg && any(data(:) < -eps))
     error('non negative scaling requires non-negative data!')
 end
 
 
 % switch between normal and hist cut off scaling
-if(histCutOff)
+if(hist_cutoff)
     
     % based on the histogram, outliers are detected and the color scale is build from the remaining values
     scaling = [scaling, 'H'];
     aux     = sort(data(~isinf(data(:))));
-    maxInd  = floor((1 - histCutOff) * numel(aux));
-    clim    = [0 aux(maxInd)];
+    max_ind  = floor((1 - hist_cutoff) * numel(aux));
+    clim    = [0 aux(max_ind)];
     if(isequal(clim,[0,0]))
         clim = [0, aux(end)];
     end
-    if(nonNeg)
+    if(non_neg)
         scaling = [scaling, 'NN'];
         return
     else
-        minInd    = ceil(histCutOff * numel(aux));
-        clim(1)   = aux(minInd);
+        min_ind    = ceil(hist_cutoff * numel(aux));
+        clim(1)   = aux(min_ind);
         if(isequal(clim,[0,0]))
             clim = [aux(1), aux(end)];
         end
@@ -115,7 +115,7 @@ else
     
     % min/max scaing
     clim = [0, max(data(~isinf(data(:))), [], 'omitnan')];
-    if(nonNeg)
+    if(non_neg)
         scaling = [scaling, 'NN'];
         return
     else
@@ -124,7 +124,7 @@ else
     
 end
 
-if(noShift)
+if(no_shift)
     clim = max(abs(clim)) * [-1, 1];
     scaling = [scaling, 'NS'];
 end

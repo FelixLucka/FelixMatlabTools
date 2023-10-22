@@ -1,4 +1,4 @@
-function [path, pathShort, filename] = genPathAndFilename(infoCell, para)
+function [path, path_short, filename] = genPathAndFilename(info_cell, para)
 %GENPATHANDFILENAME takes a cell of identifieres and constructs a path and a 
 % filename from it 
 %
@@ -16,7 +16,7 @@ function [path, pathShort, filename] = genPathAndFilename(infoCell, para)
 %   
 %
 % USAGE:
-%   [path, pathShort, filename] = genPathAndFilename(infoCell, para)
+%   [path, path_short, filename] = genPathAndFilename(info_cell, para)
 %
 % INPUTS:
 %   infoCell - cell of strings of structs (see describtion)
@@ -37,12 +37,14 @@ function [path, pathShort, filename] = genPathAndFilename(infoCell, para)
 %       a filesep char or not (a/b/c vs a/b/c/)
 %
 % OUTPUTS:
-%   x - bla bla
+%   path - see descrition
+%   path_short - see descrition
+%   filename - see descrition
 %
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 05.11.2018
-%       last update     - 15.01.2019
+%       last update     - 13.10.2023
 %
 % See also
 
@@ -52,62 +54,62 @@ if(nargin < 2)
 end
 
 % read out parameters
-mkDir    = checkSetInput(para, 'mkDir', 'logical', false);
-prefix   = checkSetInput(para, 'prefix', 'mixed', '');
-postfix  = checkSetInput(para, 'postfix', 'mixed', '');
-output   = checkSetInput(para, 'output', 'logical', false);
-fnSep    = checkSetInput(para, 'filenameSep', 'char', '_'); 
-pathSep  = checkSetInput(para, 'pathnameSep', 'char', filesep); 
-sepAtEnd = checkSetInput(para, 'sepAtEnd', 'logical', true); 
+mk_dir     = checkSetInput(para, 'mkDir', 'logical', false);
+prefix     = checkSetInput(para, 'prefix', 'mixed', '');
+postfix    = checkSetInput(para, 'postfix', 'mixed', '');
+output     = checkSetInput(para, 'output', 'logical', false);
+fn_sep     = checkSetInput(para, 'filenameSep', 'char', '_'); 
+path_sep   = checkSetInput(para, 'pathnameSep', 'char', filesep); 
+sep_at_end = checkSetInput(para, 'sepAtEnd', 'logical', true); 
 
 % convert prefix into cell if not already
 if(~iscell(prefix))
-    prefix_     = cell(size(infoCell));
+    prefix_     = cell(size(info_cell));
     prefix_(:)  = {prefix};
     prefix  = prefix_;
 end
 
 % convert postfix into cell if not already
 if(~iscell(postfix))
-    postfix_     = cell(size(infoCell));
+    postfix_     = cell(size(info_cell));
     postfix_(:)  = {postfix};
     postfix  = postfix_;
 end
 
 %%% construct path, pathShort and filename
 path      = '';
-pathShort = '';
+path_short = '';
 filename  = '';
 
 
-for iCell = 1:length(infoCell)
+for iCell = 1:length(info_cell)
     
     % attach prefix
-    path      = [path      pathSep prefix{iCell}];
-    pathShort = [pathShort pathSep prefix{iCell}];
-    filename  = [filename  fnSep   prefix{iCell}];
+    path      = [path      path_sep prefix{iCell}];
+    path_short = [path_short path_sep prefix{iCell}];
+    filename  = [filename  fn_sep   prefix{iCell}];
     
     %%% attach ID
     
     % check if the cell contains struct or string
-    if(~isstruct(infoCell{iCell}))
-        if(ischar(infoCell{iCell}))
-            ID = infoCell{iCell};
-           infoCell{iCell} = struct('ID', ID);
+    if(~isstruct(info_cell{iCell}))
+        if(ischar(info_cell{iCell}))
+            ID = info_cell{iCell};
+           info_cell{iCell} = struct('ID', ID);
         else
             error(['cell input ' int2str(iCell) ' is neither struct nor string!']);
         end
     end
     
     % attach ID to path and filename
-    if(isfield(infoCell{iCell}, 'ID'))
-        path = [path infoCell{iCell}.ID];
-        if(isfield(infoCell{iCell}, 'IDshort'))
-            pathShort = [pathShort infoCell{iCell}.IDshort];
-            filename = [filename infoCell{iCell}.IDshort];
+    if(isfield(info_cell{iCell}, 'ID'))
+        path = [path info_cell{iCell}.ID];
+        if(isfield(info_cell{iCell}, 'IDshort'))
+            path_short = [path_short info_cell{iCell}.IDshort];
+            filename = [filename info_cell{iCell}.IDshort];
         else
-            pathShort = [pathShort infoCell{iCell}.ID];
-            filename = [filename infoCell{iCell}.ID];
+            path_short = [path_short info_cell{iCell}.ID];
+            filename = [filename info_cell{iCell}.ID];
         end
     else
         error(['info struct ' int2str(iCell) ' has not ID field!']);
@@ -115,23 +117,23 @@ for iCell = 1:length(infoCell)
     
     % attach postfix
     path      = [path      postfix{iCell}];
-    pathShort = [pathShort postfix{iCell}];
+    path_short = [path_short postfix{iCell}];
     filename  = [filename  postfix{iCell}];
     
 end
 
 % remove double file seps
-path      = removeDoubleLeadTailCharacter(path,      pathSep);
-pathShort = removeDoubleLeadTailCharacter(pathShort, pathSep);
-filename  = removeDoubleLeadTailCharacter(filename,  fnSep);
+path       = removeDoubleLeadTailCharacter(path,      path_sep);
+path_short = removeDoubleLeadTailCharacter(path_short, path_sep);
+filename   = removeDoubleLeadTailCharacter(filename,  fn_sep);
 
 % add separator at the end
-if(sepAtEnd)
-    path = [path pathSep];
+if(sep_at_end)
+    path = [path path_sep];
 end
 
 % make dir
-if(mkDir)
+if(mk_dir)
     makeDir(path, output);
 end
 

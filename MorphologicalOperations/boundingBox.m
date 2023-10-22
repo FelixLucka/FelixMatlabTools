@@ -1,4 +1,4 @@
-function [BB, indices] = boundingBox(x)
+function [bb, indices] = boundingBox(x)
 %BOUNDINGBOX returns the smallest rectangular volume covering an ROI
 %
 % USAGE:
@@ -16,24 +16,24 @@ function [BB, indices] = boundingBox(x)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 03.10.2019
-%       last update     - 03.10.2019
+%       last update     - 16.05.2023
 %
 % See also
 
 
-BB      = true(size(x));
+bb      = true(size(x));
 indices = zeros(nDims(x), 2);
 
-for iDim = 1:nDims(x)
+for i_dim = 1:nDims(x)
     red_x    = x;
-    for jDime = 1:nDims(x)
-        if(jDime ~= iDim)
-            red_x = any(red_x, jDime);
+    for j_dim = 1:nDims(x)
+        if(j_dim ~= i_dim)
+            red_x = any(red_x, j_dim);
         end
     end
-    indices(iDim,1) = find(red_x(:), 1, 'first');
-    indices(iDim,2) = find(red_x(:), 1, 'last');
-    BB = bsxfun(@and , BB, red_x);
+    indices(i_dim,1) = find(red_x(:), 1, 'first');
+    indices(i_dim,2) = find(red_x(:), 1, 'last');
+    bb = bsxfun(@and , bb, red_x);
 end
 
 end

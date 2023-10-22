@@ -1,4 +1,4 @@
-function cmap = getColormap(colorStr, res, invert, para)
+function c_map = getColormap(color_str, res, invert, para)
 % GETCOLORMAP extends Matlab's colormap.m by some more color maps, in 
 % particular by bi-directional and two-dimensional ones 
 %
@@ -9,7 +9,7 @@ function cmap = getColormap(colorStr, res, invert, para)
 %   bi-directional ones
 %
 % USAGE:
-%  cmap = getColormap('blue2red', 1000)
+%  c_map = getColormap('blue2red', 1000)
 %
 %  INPUTS:
 %   colorstr    - a string identifying the color map: 
@@ -28,18 +28,19 @@ function cmap = getColormap(colorStr, res, invert, para)
 %                      encoded in the hue channel                  
 %
 %  OPTIONAL INPUTS:
-%   res         - the resolution of the color map (default: 1001)
-%   invert      - flip the colormap upside down
-%   hueMax      - for 2dim colour maps 
-%   hueMin      - for 2dim colour maps
+%   res    - the resolution of the color map (default: 1001)
+%   invert - flip the colormap upside down
+%   para   - a struct containing optional parameters
+%               - hueMin min hue value for 2dim colour maps (df: 0)
+%               - hueMax max hue value for 2dim colour maps (df: 2/3)
 %   
 %  OUTPUTS:
-%   cmap        - an array of size [res, 3] representing RGB channels of the color map
+%   c_map        - an array of size [res, 3] representing RGB channels of the color map
 %
 % ABOUT:
 %   author          - Felix Lucka
 %   date            - 13.12.2017
-%   last update     - 16.11.2021
+%   last update     - 13.10.2023
 %
 % See also assignColorMap, str2RGB
 
@@ -58,9 +59,9 @@ if(nargin < 4)
     para = [];
 end
 
-cmap = ones(res, 3);
+c_map = ones(res, 3);
 
-switch colorStr
+switch color_str
     
     case {'autumn', 'spring', 'summer', 'winter', 'bone', 'jet', ...
             'hot', 'cool', 'copper', 'gray', 'hsv', 'parula', 'prism',...
@@ -68,31 +69,31 @@ switch colorStr
         
         % Matlab's build in color maps
         figure1 = figure;
-        eval(['cmap = colormap(' colorStr '(' int2str(res) '));']);
+        eval(['c_map = colormap(' color_str '(' int2str(res) '));']);
         close(figure1);
         
     case 'red'
         
         % a red scale
-        cmap(:, 2) = ((res-1):-1:0) / res;
-        cmap(:, 3) = ((res-1):-1:0) / res;
+        c_map(:, 2) = ((res-1):-1:0) / res;
+        c_map(:, 3) = ((res-1):-1:0) / res;
         
     case 'green'
         
         % a green scale
-        cmap(:, 1) = ((res-1):-1:0) / res;
-        cmap(:, 3) = ((res-1):-1:0) / res;
+        c_map(:, 1) = ((res-1):-1:0) / res;
+        c_map(:, 3) = ((res-1):-1:0) / res;
         
     case 'blue'
         
         % a blue scale
-        cmap(:, 1) = ((res-1):-1:0) / res;
-        cmap(:, 2) = ((res-1):-1:0) / res;
+        c_map(:, 1) = ((res-1):-1:0) / res;
+        c_map(:, 2) = ((res-1):-1:0) / res;
         
     case 'rand'
         
         % a random colour map
-        cmap = rand(res, 3);
+        c_map = rand(res, 3);
         
     case 'blue2red'
         
@@ -100,12 +101,12 @@ switch colorStr
         % blue to red where white should be used for 0
         if(mod(res, 2) == 0)
            res = res + 1; 
-           cmap = ones(res, 3);
+           c_map = ones(res, 3);
         end
         
-        cmap(:, 1) = min(1, 2*(0:1:(res-1)) / res);
-        cmap(:, 2) = min(2*((res-1):-1:0) / res, 2*(0:1:(res-1)) / res);
-        cmap(:, 3) = min(2*((res-1):-1:0) / res, 1);
+        c_map(:, 1) = min(1, 2*(0:1:(res-1)) / res);
+        c_map(:, 2) = min(2*((res-1):-1:0) / res, 2*(0:1:(res-1)) / res);
+        c_map(:, 3) = min(2*((res-1):-1:0) / res, 1);
         
     case 'cool2hot'
         
@@ -113,54 +114,54 @@ switch colorStr
         % for positive vales to a cool color scale for negative values 
         % black should is used for 0
         figure1 = figure;
-        eval(['cmapHot = colormap(hot(' int2str(floor(res/2)) '));']);
+        eval(['cmap_hot = colormap(hot(' int2str(floor(res/2)) '));']);
         close(figure1);
-        cmapCold = flipud([cmapHot(:, 3), cmapHot(:,2), cmapHot(:, 1)]);
-        cmap     = [cmapCold; 0, 0, 0; cmapHot];
+        cmap_cold = flipud([cmap_hot(:, 3), cmapHot(:,2), cmapHot(:, 1)]);
+        c_map     = [cmap_cold; 0, 0, 0; cmapHot];
         
     case 'kWave'
         
         % get the k-Wave color scale (kWave needs to be on the path!)
-        cmap = getColorMap(res + mod(res, 2));
+        c_map = getColorMap(res + mod(res, 2));
         
     case {'inferno', 'magma', 'plasma', 'viridis'}
         
         % load python color maps provided by Ander Biguri:
         % Ander Biguri (2021). Perceptually uniform colormaps (https://www.mathworks.com/matlabcentral/fileexchange/51986-perceptually-uniform-colormaps), MATLAB Central File Exchange. Retrieved January 2, 2021.
-        eval(['cmap = ' colorStr '(' int2str(res) ');']);
+        eval(['c_map = ' color_str '(' int2str(res) ');']);
         
     case {'hv2dim', 'hs2dim', 'hsv2dim', 'red2dim', 'blue2dim', 'blue2red2dim'}
         
         % 2 dimensional colour maps
-        hueMax = checkSetInput(para, 'hueMax', '>=0', 2/3);
-        hueMin = checkSetInput(para, 'hueMin', '>=0', 0);
+        hue_max = checkSetInput(para, 'hueMax', '>=0', 2/3);
+        hue_min = checkSetInput(para, 'hueMin', '>=0', 0);
         
-        [X,Y] = meshgrid(linspace(hueMin, hueMax, res), linspace(0,1,res));
-        switch colorStr
+        [X,Y] = meshgrid(linspace(hue_min, hue_max, res), linspace(0,1,res));
+        switch color_str
             case 'hv2dim'
-                cmap  = cat(3, X, ones(size(X)), Y);
+                c_map  = cat(3, X, ones(size(X)), Y);
             case 'hs2dim'
-                cmap  = cat(3, X, Y, ones(size(X)));
+                c_map  = cat(3, X, Y, ones(size(X)));
             case 'hsv2dim'
-                cmap  = cat(3, X, Y, Y);
+                c_map  = cat(3, X, Y, Y);
             case 'red2dim'
-                cmap  = cat(3, ones(size(X)), Y', Y);
+                c_map  = cat(3, ones(size(X)), Y', Y);
             case 'blue2dim'
-                cmap  = cat(3, 2/3 * ones(size(X)), Y', Y);
+                c_map  = cat(3, 2/3 * ones(size(X)), Y', Y);
             case 'blue2red2dim'
-                cmapRed   = cat(3, ones(size(X)), Y', Y);
-                cmapBlue  = cat(3, 2/3 * ones(size(X)), Y', Y);
-                cmap      = cat(2, flip(cmapBlue, 2), cmapRed);
-                cmap      = cmap(:,1:2:end,:);
+                cmap_red   = cat(3, ones(size(X)), Y', Y);
+                cmap_blue  = cat(3, 2/3 * ones(size(X)), Y', Y);
+                c_map      = cat(2, flip(cmap_blue, 2), cmap_red);
+                c_map      = c_map(:,1:2:end,:);
         end
-        cmap = hsv2rgb(cmap);
+        c_map = hsv2rgb(c_map);
         
     otherwise
-        error(['Unkown colorstr: ' colorStr]);
+        error(['Unkown colorstr: ' color_str]);
 end
 
 if(invert)
-    cmap = flipud(cmap);
+    c_map = flipud(c_map);
 end
 
 end

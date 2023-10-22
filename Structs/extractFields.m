@@ -1,11 +1,11 @@
-function structNew = extractFields(struct, fieldnames)
+function struct_new = extractFields(struct, field_names)
 % EXTRACTFIELDS extracts a subset of fields from a struct
 %
 %   structNew = extractFields(struct,{'a','b'})
 %
 %  INPUT:
 %   struct - a struct
-%   fieldnames - a cell of fieldnames as chars
+%   field_names - a cell of fieldnames as chars
 %
 %  OUTPUTS:
 %   structNew - the struct with only the fields specified in fieldnames
@@ -13,15 +13,15 @@ function structNew = extractFields(struct, fieldnames)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 05.11.2018
-%       last update     - 05.11.2018
+%       last update     - 16.05.2023
 %
 % See also removeFields, overwriteFields, enforceFields
 
-structNew = emptyStruct;
+struct_new = emptyStruct;
 
-for i=1:length(fieldnames)
-    if(isfield(struct,fieldnames{i}))
-        structNew.(fieldnames{i}) = struct.(fieldnames{i});
+for i=1:length(field_names)
+    if(isfield(struct,field_names{i}))
+        struct_new.(field_names{i}) = struct.(field_names{i});
     end
 end
 

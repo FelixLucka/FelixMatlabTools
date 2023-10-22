@@ -1,4 +1,4 @@
-function [Im, refCard] = rgbComposite(Im1, Im2, para)
+function [im, ref_card] = rgbComposite(im1, im2, para)
 % RGBCOMPOSITE mixes two gray scale images into an RGB
 %
 % DETAILS:
@@ -7,11 +7,11 @@ function [Im, refCard] = rgbComposite(Im1, Im2, para)
 % a color code or one is shown overlayed on the other
 %
 % USAGE:
-%   [Im, RefCard] = RGBcomposite(rand(100), rand(100), [])
+%   [im, ref_card] = RGBcomposite(rand(100), rand(100), [])
 %
 % INPUTS:
-%   Im1 - first  non-negative intensity image
-%   Im2 - second non-negative intensity image
+%   im1 - first  non-negative intensity image
+%   im2 - second non-negative intensity image
 %
 % OPTIONAL INPUTS:
 %   para - a struct containing further optional parameters:
@@ -41,13 +41,13 @@ function [Im, refCard] = rgbComposite(Im1, Im2, para)
 %       
 %
 % OUTPUTS:
-%   Im      - the mixed RGB image
-%   refCard - an image that displays the mapping used
+%   im      - the mixed RGB image
+%   ref_card - an image that displays the mapping used
 %
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 03.12.2018
-%       last update     - 06.12.2018
+%       last update     - 20.04.2023
 %
 % See also overlayRGBs
 
@@ -57,34 +57,34 @@ if(nargin < 3)
 end
 
 % check for negative values
-if(anyAll(Im1 < 0) || anyAll(Im1 < 0))
+if(anyAll(im1 < 0) || anyAll(im2 < 0))
     error('Both input images must be non-negative')
 end
 
 % scale to [0 1]
-Im1 = Im1 / maxAll(Im1);
-Im2 = Im2 / maxAll(Im2);
+im1 = im1 / maxAll(im1);
+im2 = im2 / maxAll(im2);
 
 % increase the image resolution by interpolation
-resIncExp = checkSetInput(para,'resIncExp', 'double', 0);
-Im1       = interp2(Im1, resIncExp);
-Im2       = interp2(Im2, resIncExp);
+res_inc_exp = checkSetInput(para,'resIncExp', 'double', 0);
+im1         = interp2(im1, res_inc_exp);
+im2         = interp2(im2, res_inc_exp);
 
 % define the mixing scheme
-compositeMode = checkSetInput(para, 'compositeMode', {'mixing', 'overlay'},...
+composite_mode = checkSetInput(para, 'compositeMode', {'mixing', 'overlay'},...
     'mixing');
 
-refCard = [];
+ref_card = [];
 
-switch compositeMode
+switch composite_mode
     
     case 'mixing'
         
-        mixingScheme = checkSetInput(para,'mixingScheme', ...
+        mixing_scheme = checkSetInput(para,'mixingScheme', ...
             {'red2green', 'rainbow', 'trafficlight'}, 'rainbow');
         
         [X, Y] = meshgrid(0:0.5:1, 0:0.5:1);
-        switch mixingScheme
+        switch mixing_scheme
             case 'red2green'
                 R = X;
                 G = Y;
@@ -100,41 +100,40 @@ switch compositeMode
         end
         
         % generate reference image RefCard
-        refCardRes     = checkSetInput(para, 'refCardRes', 'i,>0', 500);
-        [X_ref, Y_ref] = meshgrid(linspace(0, 1, refCardRes));
+        ref_card_res     = checkSetInput(para, 'refCardRes', 'i,>0', 500);
+        [X_ref, Y_ref] = meshgrid(linspace(0, 1, ref_card_res));
         
-        refCard        = zeros(refCardRes,refCardRes,3);
-        refCard(:,:,1) = interp2(X, Y, R, X_ref, Y_ref);
-        refCard(:,:,2) = interp2(X, Y, G, X_ref, Y_ref);
-        refCardalphaOverlay(:,:,3) = interp2(X, Y, B, X_ref, Y_ref);
+        ref_card        = zeros(ref_card_res,ref_card_res,3);
+        ref_card(:,:,1) = interp2(X, Y, R, X_ref, Y_ref);
+        ref_card(:,:,2) = interp2(X, Y, G, X_ref, Y_ref);
         
         % generate mixed RGB image
-        Im        = zeros(size(Im1,1),size(Im1,2),3);
-        Im(:,:,1) = reshape(interp2(X,Y,R,Im1(:),Im2(:)),size(Im1,1),size(Im1,2));
-        Im(:,:,2) = reshape(interp2(X,Y,G,Im1(:),Im2(:)),size(Im1,1),size(Im1,2));
-        Im(:,:,3) = reshape(interp2(X,Y,B,Im1(:),Im2(:)),size(Im1,1),size(Im1,2));
+        im        = zeros(size(im1,1),size(im1,2),3);
+        im(:,:,1) = reshape(interp2(X,Y,R,im1(:),im2(:)),size(im1,1),size(im1,2));
+        im(:,:,2) = reshape(interp2(X,Y,G,im1(:),im2(:)),size(im1,1),size(im1,2));
+        im(:,:,3) = reshape(interp2(X,Y,B,im1(:),im2(:)),size(im1,1),size(im1,2));
         
     case 'overlay'
         
         thres   = checkSetInput(para, 'thres', 'double', 0.1);
-        fgPara  = checkSetInput(para, 'fgPara', 'struct', struct('colorMap', 'parula'));
-        bgPara  = checkSetInput(para, 'bgPara', 'struct', struct('colorMap', 'gray'));
-        alphaOverlay = checkSetInput(para,'alphaOverlay', 'double', 0.5);
+        fg_para  = checkSetInput(para, 'fgPara', 'struct', struct('colorMap', 'parula'));
+        bg_para  = checkSetInput(para, 'bgPara', 'struct', struct('colorMap', 'gray'));
+        alpha_overlay = checkSetInput(para,'alphaOverlay', 'double', 0.5);
         
-        RGB1    = data2RGB(Im1, fgPara);
-        RGB2    = data2RGB(Im2, bgPara);
+        RGB1    = data2RGB(im1, fg_para);
+        RGB2    = data2RGB(im2, bg_para);
         
         % take FgIm_mask as alpha
-        fgAlpha = alphaOverlay * (Im1 > thres);
+        fg_alpha = alpha_overlay * (im1 > thres);
         
         smooth = checkSetInput(para,'smoothFGmask','logical',true);
         if(smooth)
             % TODO: replace by gaussianKernel.m
-            fgAlpha = imfilter(fgAlpha, fspecial('gaussian',...
-                                2^(resIncExp+1),2^(resIncExp)));
+            fg_alpha = imfilter(fg_alpha, fspecial('gaussian',...
+                                2^(res_inc_exp+1),2^(res_inc_exp)));
         end
         
-        Im = overlayRGBs(RGB1, RGB2, fgAlpha);
+        im = overlayRGBs(RGB1, RGB2, fg_alpha);
         
 end
 

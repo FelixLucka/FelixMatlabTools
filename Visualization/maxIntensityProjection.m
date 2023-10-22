@@ -1,4 +1,4 @@
-function [figureH, RGB] = maxIntensityProjection(im, info, para)
+function [figure_h, RGB] = maxIntensityProjection(im, info, para)
 % MAXINTENSITYPROJECTION plots the maximum intensity projections of a given
 % 3D volume or of a sequece of 3D volumes image as a movie
 %
@@ -6,8 +6,8 @@ function [figureH, RGB] = maxIntensityProjection(im, info, para)
 %   TODO
 %
 % USAGE:
-%   [figureH, RGB] = maxIntensityProjection(p,setting,para)
-%   maxIntensityProjection(p,setting)
+%   [figure_h, rgb] = maxIntensityProjection(p, setting, para)
+%   maxIntensityProjection(p, setting)
 %
 %  INPUTS:
 %   im    - 3D array or cell of 3D arrays
@@ -31,13 +31,13 @@ function [figureH, RGB] = maxIntensityProjection(im, info, para)
 %       'font'        - the font used in the frame identifier, see BitmapFont.m;
 %
 %  OUTPUTS:
-%   figureH           - handle to the figure
-%   RGB               - the projections as a cell of RGB images
+%   figure_h      - handle to the figure
+%   RGB           - the projections as a cell of RGB images
 %
 % ABOUT:
 %   author          - Felix Lucka
 %   date            - 13.12.2017
-%   last update     - 13.12.2017
+%   last update     - 14.10.2023
 %
 % See also slicePlot, flyThroughVolume
 
@@ -53,50 +53,50 @@ end
 
 if(~iscell(im))
     
-    figureH = assignOrCreateFigureHandle(para);
+    figure_h = assignOrCreateFigureHandle(para);
     
     title = checkSetInput(para, 'title', 'char', 'Maximum Intensity Projection');
-    set(figureH, 'Name', title);
+    set(figure_h, 'Name', title);
     
     % maximum intensity projection in X direction
-    subX   = subplot(1, 3, 1, 'Parent', figureH);
-    RGB{1} = maxIntProHelp(subX, im, 1, 'X', para);
+    sub_x  = subplot(1, 3, 1, 'Parent', figure_h);
+    RGB{1} = maxIntProHelp(sub_x, im, 1, 'X', para);
     
     % maximum intensity projection in Y direction
-    subY   = subplot(1, 3, 2, 'Parent', figureH);
-    RGB{2} = maxIntProHelp(subY, im, 2, 'Y', para);
+    sub_y  = subplot(1, 3, 2, 'Parent', figure_h);
+    RGB{2} = maxIntProHelp(sub_y, im, 2, 'Y', para);
     
     % maximum intensity projection in Z direction
-    subZ   = subplot(1, 3, 3, 'Parent', figureH);
-    RGB{3} = maxIntProHelp(subZ, im, 3, 'Z', para);
+    sub_z  = subplot(1, 3, 3, 'Parent', figure_h);
+    RGB{3} = maxIntProHelp(sub_z, im, 3, 'Z', para);
     
     print = checkSetInput(para,'print', 'logical', false);
     if(print)
         
         % images are printed to .png files
-        incRes4AnisoVoxel = checkSetInput(para, 'incRes4AnisoVoxel', 'logical', false);
+        inc_res_4_aniso_voxel = checkSetInput(para, 'incRes4AnisoVoxel', 'logical', false);
         
-        printPara    = [];
-        rootFilename = checkSetInput(para, 'fileName', 'char', 'maxIntensityPro');
-        rootFilename = strrep(rootFilename,'.png','');
+        print_para    = [];
+        root_filename = checkSetInput(para, 'fileName', 'char', 'maxIntensityPro');
+        root_filename = strrep(root_filename,'.png','');
         
-        printPara.fileName = [rootFilename '_mIX.png'];
-        if(incRes4AnisoVoxel)
-            printPara.printPixPerPix = round([info.dy, info.dz] / min(info.dy, info.dz));
+        print_para.fileName = [root_filename '_mIX.png'];
+        if(inc_res_4_aniso_voxel)
+            print_para.printPixPerPix = round([info.dy, info.dz] / min(info.dy, info.dz));
         end
-        printRGB(RGB{1}, printPara);
+        printRGB(RGB{1}, print_para);
         
-        printPara.fileName = [rootFilename '_mIY.png'];
-        if(incRes4AnisoVoxel)
-            printPara.printPixPerPix = round([info.dx, info.dz] / min(info.dx, info.dz));
+        print_para.fileName = [root_filename '_mIY.png'];
+        if(inc_res_4_aniso_voxel)
+            print_para.printPixPerPix = round([info.dx, info.dz] / min(info.dx, info.dz));
         end
-        printRGB(RGB{2}, printPara);
+        printRGB(RGB{2}, print_para);
         
-        printPara.fileName = [rootFilename '_mIZ.png'];
-        if(incRes4AnisoVoxel)
-            printPara.printPixPerPix = round([info.dx, info.dy] / min(info.dx, info.dy));
+        print_para.fileName = [root_filename '_mIZ.png'];
+        if(inc_res_4_aniso_voxel)
+            print_para.printPixPerPix = round([info.dx, info.dy] / min(info.dx, info.dy));
         end
-        printRGB(RGB{3}, printPara);
+        printRGB(RGB{3}, print_para);
     end
     
     drawnow();
@@ -108,18 +108,18 @@ else
     T = length(im);
     
     %%% read inputs and parameter
-    fps                = checkSetInput(para, 'fps', '>0', 1);
-    loop               = checkSetInput(para, 'loop', 'i,>0', 1);
-    print              = checkSetInput(para, 'print', 'logical', false);
-    addFrameIdentifier = checkSetInput(para, 'addFrameIdentifier', 'logical', false);
-    fontSize           = checkSetInput(para, 'fontSize', 'i,>0', 20);
-    animatedGif        = checkSetInput(para, 'animatedGif', 'logical', false);
-    endFrame           = checkSetInput(para, 'endFrame', 'i,>0', T);
-    endFrame           = min(T, endFrame);
+    fps          = checkSetInput(para, 'fps', '>0', 1);
+    loop         = checkSetInput(para, 'loop', 'i,>0', 1);
+    print        = checkSetInput(para, 'print', 'logical', false);
+    add_frame_id = checkSetInput(para, 'addFrameIdentifier', 'logical', false);
+    font_size    = checkSetInput(para, 'fontSize', 'i,>0', 20);
+    animated_gif = checkSetInput(para, 'animatedGif', 'logical', false);
+    end_frame    = checkSetInput(para, 'endFrame', 'i,>0', T);
+    end_frame    = min(T, end_frame);
     
     % add a string that identifies the frame number
-    if(addFrameIdentifier)
-        font = BitmapFont('Arial', fontSize, 't=1234567890');
+    if(add_frame_id)
+        font = BitmapFont('Arial', font_size, 't=1234567890');
     end
     
     % extend fps to vector
@@ -131,12 +131,12 @@ else
     % try loop determines function without error if user closes the window
     try
         
-        figureH = assignOrCreateFigureHandle(para);
-        set(figureH, 'Name', 'preparing RGB data...');
+        figure_h = assignOrCreateFigureHandle(para);
+        set(figure_h, 'Name', 'preparing RGB data...');
         
         %%% first prepare and print all the RGBs
-        dynamicScaling = checkSetInput(para, 'dynamicScaling', {'singleFrame', 'allFrames'}, 'singleFrame');
-        switch dynamicScaling
+        dynamic_scaling = checkSetInput(para, 'dynamicScaling', {'singleFrame', 'allFrames'}, 'singleFrame');
+        switch dynamic_scaling
             case 'singleFrame'
             case 'allFrames'
                 [clim, ~]    = determineClim(vec(cell2mat(im)), para);
@@ -156,107 +156,107 @@ else
             
             if(print)
                 % images are printed to .png files
-                incRes4AnisoVoxel = checkSetInput(para, 'incRes4AnisoVoxel', 'logical', false);
-                if(incRes4AnisoVoxel)
+                inc_res_4_aniso_voxel = checkSetInput(para, 'incRes4AnisoVoxel', 'logical', false);
+                if(inc_res_4_aniso_voxel)
                     enforceFields(info, 'info', {'dx', 'dy', 'dz'})
                 end
                 
-                printPara = [];
-                rootFilename = checkSetInput(para, 'fileName', 'char', 'maxIntensityPro');
-                rootFilename = strrep(rootFilename,'.png','');
-                rootFilename = strrep(rootFilename, '$frame$', int2str(i_T));
+                print_para = [];
+                root_filename = checkSetInput(para, 'fileName', 'char', 'maxIntensityPro');
+                root_filename = strrep(root_filename,'.png','');
+                root_filename = strrep(root_filename, '$frame$', int2str(i_T));
                 
-                printPara.fileName = [rootFilename '_mIX.png'];
-                if(incRes4AnisoVoxel)
-                    printPara.printPixPerPix = round([info.dy, info.dz] / min(info.dy, info.dz));
+                print_para.fileName = [root_filename '_mIX.png'];
+                if(inc_res_4_aniso_voxel)
+                    print_para.printPixPerPix = round([info.dy, info.dz] / min(info.dy, info.dz));
                 end
-                printRGB(RGB{1, i_T}, printPara);
+                printRGB(RGB{1, i_T}, print_para);
                 
-                printPara.fileName = [rootFilename '_mIY.png'];
-                if(incRes4AnisoVoxel)
-                    printPara.printPixPerPix = round([info.dx, info.dz] / min(info.dx, info.dz));
+                print_para.fileName = [root_filename '_mIY.png'];
+                if(inc_res_4_aniso_voxel)
+                    print_para.printPixPerPix = round([info.dx, info.dz] / min(info.dx, info.dz));
                 end
-                printRGB(RGB{2, i_T}, printPara);
+                printRGB(RGB{2, i_T}, print_para);
                 
-                printPara.fileName = [rootFilename '_mIZ.png'];
-                if(incRes4AnisoVoxel)
-                    printPara.printPixPerPix = round([info.dx, info.dy] / min(info.dx, info.dy));
+                print_para.fileName = [root_filename '_mIZ.png'];
+                if(inc_res_4_aniso_voxel)
+                    print_para.printPixPerPix = round([info.dx, info.dy] / min(info.dx, info.dy));
                 end
-                printRGB(RGB{3, i_T}, printPara);
+                printRGB(RGB{3, i_T}, print_para);
             end
             
-            if(addFrameIdentifier)
+            if(add_frame_id)
                 % add text to identify the frames, in top left corner,
                 % with offset = fontSize (can be extended later)
-                frameIdentifier = ['t=' int2str(i_T)];
-                RGB{1, i_T} = AddTextToImage(RGB{1, i_T}, frameIdentifier, ceil(fontSize/4)*[1 1], [1 0 1], font);
+                frame_id    = ['t=' int2str(i_T)];
+                RGB{1, i_T} = AddTextToImage(RGB{1, i_T}, frame_id, ceil(font_size/4)*[1 1], [1 0 1], font);
             end
         end
         
         % generate animated gif before the images is shown
-        if(animatedGif)
+        if(animated_gif)
             
-            set(figureH, 'Name', 'generating animated gif...');
-            animationPara = para;
-            rootFilename  = checkSetInput(animationPara, 'fileName', 'char', 'maxIntensityProMovie');
-            rootFilename  = strrep(rootFilename, '.gif', '');
-            rootFilename  = strrep(rootFilename, '$frame$', '');
-            animationPara.fileName = [rootFilename '_mI'];
-            animationPara.fps = checkSetInput(animationPara, 'fpsMovie', 'double', mean(fps));
+            set(figure_h, 'Name', 'generating animated gif...');
+            animation_para = para;
+            root_filename  = checkSetInput(animation_para, 'fileName', 'char', 'maxIntensityProMovie');
+            root_filename  = strrep(root_filename, '.gif', '');
+            root_filename  = strrep(root_filename, '$frame$', '');
+            animation_para.fileName = [root_filename '_mI'];
+            animation_para.fps = checkSetInput(animation_para, 'fpsMovie', 'double', mean(fps));
             
-            RGBmovie = cell(1, T);
-            gapColor = checkSetInput(para, 'gapColor', 'double', [0 0 0]);
-            gapWidth = checkSetInput(para, 'gapWidth', 'i,>0', 10);
+            rgb_movie = cell(1, T);
+            gap_color = checkSetInput(para, 'gapColor', 'double', [0 0 0]);
+            gap_width = checkSetInput(para, 'gapWidth', 'i,>0', 10);
             
-            lengthVert = max([size(RGB{1, 1}, 2), size(RGB{2, 1}, 2), size(RGB{3, 1}, 2)]);
-            fillVert   = ones(gapWidth, lengthVert);
-            fillVert   = cat(3, gapColor(1) * fillVert, gapColor(2) * fillVert, gapColor(3) * fillVert);
+            length_vert = max([size(RGB{1, 1}, 2), size(RGB{2, 1}, 2), size(RGB{3, 1}, 2)]);
+            fill_vert   = ones(gap_width, length_vert);
+            fill_vert   = cat(3, gap_color(1) * fill_vert, gap_color(2) * fill_vert, gap_color(3) * fill_vert);
             for iDim = 1:3
-                fillHorz{iDim} = ones(size(RGB{iDim, 1}, 1), lengthVert-size(RGB{iDim, 1}, 2));
-                fillHorz{iDim} = cat(3, gapColor(1) * fillHorz{iDim}, gapColor(2) * fillHorz{iDim}, gapColor(3) * fillHorz{iDim});
+                fill_horz{iDim} = ones(size(RGB{iDim, 1}, 1), length_vert-size(RGB{iDim, 1}, 2));
+                fill_horz{iDim} = cat(3, gap_color(1) * fill_horz{iDim}, gap_color(2) * fill_horz{iDim}, gap_color(3) * fill_horz{iDim});
             end
             for i_T = 1:T
-                RGBmovie{i_T} = cat(1, cat(2, RGB{1,i_T}, fillHorz{1}),...
-                    fillVert, cat(2, RGB{2, i_T}, fillHorz{2}),...
-                    fillVert, cat(2, RGB{3, i_T}, fillHorz{3}));
+                rgb_movie{i_T} = cat(1, cat(2, RGB{1,i_T}, fill_horz{1}),...
+                    fill_vert, cat(2, RGB{2, i_T}, fill_horz{2}),...
+                    fill_vert, cat(2, RGB{3, i_T}, fill_horz{3}));
             end
             
             % call movieFromRGB.m to do the conversion
-            movieFromRGB(RGBmovie, animationPara);
+            movieFromRGB(rgb_movie, animation_para);
             
         end
         
         
         %%% create  axis
-        axesXH = subplot(1, 3, 1, 'Parent', figureH, 'YTick', zeros(1, 0), ...
+        axes_x_h = subplot(1, 3, 1, 'Parent', figure_h, 'YTick', zeros(1, 0), ...
             'YDir', 'reverse', 'XTick', zeros(1, 0), 'Layer', 'top', 'DataAspectRatio', [1 1 1]);
-        box(axesXH, 'on'); hold(axesXH, 'all');
-        image(zeros(size(RGB{1, 1})), 'Parent', axesXH);
-        ylim(axesXH, [0.5, size(RGB{1, 1}, 1) + 0.5]); 
-        xlim(axesXH, [0.5, size(RGB{1, 1}, 2) + 0.5]);
-        imageHandleFly{1} = get(axesXH, 'Children');
+        box(axes_x_h, 'on'); hold(axes_x_h, 'all');
+        image(zeros(size(RGB{1, 1})), 'Parent', axes_x_h);
+        ylim(axes_x_h, [0.5, size(RGB{1, 1}, 1) + 0.5]); 
+        xlim(axes_x_h, [0.5, size(RGB{1, 1}, 2) + 0.5]);
+        imageHandleFly{1} = get(axes_x_h, 'Children');
         ylabel('y'); xlabel('z');
-        axesXH.Title.String = 'X projection';
+        axes_x_h.Title.String = 'X projection';
         
-        axesYH = subplot(1, 3, 2, 'Parent', figureH, 'YTick', zeros(1, 0), ...
+        axes_y_h = subplot(1, 3, 2, 'Parent', figure_h, 'YTick', zeros(1, 0), ...
             'YDir', 'reverse', 'XTick', zeros(1, 0), 'Layer', 'top', 'DataAspectRatio', [1 1 1]);
-        box(axesYH,'on'); hold(axesYH, 'all');
-        image(zeros(size(RGB{2, 1})), 'Parent', axesYH);
-        ylim(axesYH, [0.5, size(RGB{2, 1}, 1) + 0.5]); 
-        xlim(axesYH, [0.5, size(RGB{2, 1}, 2) + 0.5]);
-        imageHandleFly{2} = get(axesYH, 'Children');
+        box(axes_y_h,'on'); hold(axes_y_h, 'all');
+        image(zeros(size(RGB{2, 1})), 'Parent', axes_y_h);
+        ylim(axes_y_h, [0.5, size(RGB{2, 1}, 1) + 0.5]); 
+        xlim(axes_y_h, [0.5, size(RGB{2, 1}, 2) + 0.5]);
+        imageHandleFly{2} = get(axes_y_h, 'Children');
         ylabel('x'); xlabel('z');
-        axesYH.Title.String = 'Y projection';
+        axes_y_h.Title.String = 'Y projection';
         
-        axesZH = subplot(1, 3, 3,'Parent', figureH, 'YTick',zeros(1, 0), ...
+        axes_z_h = subplot(1, 3, 3,'Parent', figure_h, 'YTick',zeros(1, 0), ...
             'YDir', 'reverse', 'XTick', zeros(1, 0), 'Layer', 'top', 'DataAspectRatio', [1 1 1]);
-        box(axesZH, 'on'); hold(axesZH, 'all');
-        image(zeros(size(RGB{3, 1})), 'Parent', axesZH);
-        ylim(axesZH, [0.5, size(RGB{3, 1}, 1) + 0.5]); 
-        xlim(axesZH, [0.5, size(RGB{3, 1}, 2) + 0.5]);
-        imageHandleFly{3} = get(axesZH, 'Children');
+        box(axes_z_h, 'on'); hold(axes_z_h, 'all');
+        image(zeros(size(RGB{3, 1})), 'Parent', axes_z_h);
+        ylim(axes_z_h, [0.5, size(RGB{3, 1}, 1) + 0.5]); 
+        xlim(axes_z_h, [0.5, size(RGB{3, 1}, 2) + 0.5]);
+        imageHandleFly{3} = get(axes_z_h, 'Children');
         ylabel('x'); xlabel('y');
-        axesZH.Title.String = 'Z projection';
+        axes_z_h.Title.String = 'Z projection';
         
         
         %%% plotting, the try block will catch an error if the figure is closed
@@ -265,18 +265,18 @@ else
         while(i_loop < loop)
             i_loop = i_loop + 1;
             for i_T = 1:T
-                tPlotFly = tic;
+                t_pl_fly = tic;
                 for i_pl = 1:length(imageHandleFly)
                     set(imageHandleFly{i_pl}, 'CData', RGB{i_pl, i_T});
                 end
-                set(figureH, 'Name', ['Maximum intensity projection, frame = ' int2str(i_T)]);
-                pause(1/fps(i_T) - toc(tPlotFly))
+                set(figure_h, 'Name', ['Maximum intensity projection, frame = ' int2str(i_T)]);
+                pause(1/fps(i_T) - toc(t_pl_fly))
             end
         end
         for i_pl = 1:length(imageHandleFly)
-            set(imageHandleFly{i_pl}, 'CData', RGB{i_pl, endFrame});
+            set(imageHandleFly{i_pl}, 'CData', RGB{i_pl, end_frame});
         end
-        set(figureH, 'Name', ['Maximum intensity projection, frame = ' int2str(endFrame)]);
+        set(figure_h, 'Name', ['Maximum intensity projection, frame = ' int2str(end_frame)]);
         %close(figureH);
         
     catch exception

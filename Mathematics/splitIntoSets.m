@@ -1,39 +1,37 @@
-function split = splitIntoSets(vector, nSplit)
-%FUNCTIONTEMPLATE is a template for a function describtion
+function split = splitIntoSets(vector, n_split)
+%SPLITINTOSETS can be used to split a vector into even sub-sets
 %
 % DETAILS: 
-%   functionTemplate.m can be used as a template 
+%   splitIntoSets.m can be used to split a vector into as even as possible
+%   sub-sets:
 %
 % USAGE:
-%   x = functionTemplate(y)
+%   splitIntoSets(1:4, 2) returns {[1,2],[3,4]} 
+%   splitIntoSets(1:3, 2) returns {[1,2],[3]} 
 %
 % INPUTS:
-%   y - bla bla
-%
-% OPTIONAL INPUTS:
-%   z    - bla bla
-%   para - a struct containing further optional parameters:
-%       'a' - parameter a
+%   vector  - the vector to split up
+%   n_split - the number of sub-sets
 %
 % OUTPUTS:
-%   x - bla bla
+%   split - cell with sub-sets
 %
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 19.12.2018
-%       last update     - 19.12.2018
+%       last update     - 16.05.2023
 %
 % See also
 
-n                = length(vector);
-binLength        = floor(n/nSplit) * ones(1, nSplit);
-mis              = n - sum(binLength);
-binLength(1:mis) = binLength(1:mis) + 1;
-startInd         = cumsum([1,binLength]);
-split            = cell(1, nSplit);
+n                 = length(vector);
+bin_length        = floor(n/n_split) * ones(1, n_split);
+mis               = n - sum(bin_length);
+bin_length(1:mis) = bin_length(1:mis) + 1;
+start_ind         = cumsum([1,bin_length]);
+split             = cell(1, n_split);
 
-for iSplit=1:nSplit
-    split{iSplit} = vector(startInd(iSplit):(startInd(iSplit+1)-1));
+for iSplit=1:n_split
+    split{iSplit} = vector(start_ind(iSplit):(start_ind(iSplit+1)-1));
 end
 
 end

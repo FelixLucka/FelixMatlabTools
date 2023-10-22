@@ -1,9 +1,9 @@
-function enforceFields(struct, structName, fieldNames)
+function enforceFields(struct, struct_name, field_names)
 % ENFORCEFIELDS checks if a struct has certain fields and throws an error
 % otherwise
 %
 % DESCRIPTION:
-%   enforceFields can be used to ensure that a struct contains certain
+%   enforceFields.m can be used to ensure that a struct contains certain
 %   fields before using them in some part of the code
 %
 % USAGE:
@@ -18,26 +18,26 @@ function enforceFields(struct, structName, fieldNames)
 % ABOUT:
 %   author          - Felix Lucka
 %   date            - 13.12.2017
-%   last update     - 13.12.2017
+%   last update     - 16.05.2023
 %
 % See also listDifferentFields, compareStructs
 
 % ensure fieldNames is a cell
-fieldNames = checkSetInput(fieldNames, [], 'cell', 'error');
+field_names = checkSetInput(field_names, [], 'cell', 'error');
 
-errorMsg = ['struct ' structName ' does not have required fields ' ];
-throwErr = false;
-for i = 1:length(fieldNames)
-    if(~isfield(struct, fieldNames{i}))
-        throwErr = true;
-        errorMsg = [errorMsg '''' fieldNames{i} ''', '];
+error_msg = ['struct ' struct_name ' does not have required fields ' ];
+throw_err = false;
+for i = 1:length(field_names)
+    if(~isfield(struct, field_names{i}))
+        throw_err = true;
+        error_msg = [error_msg '''' field_names{i} ''', '];
     end
 end
-errorMsg(end-1) = '.';
-errorMsg        = errorMsg(1:end-1);
+error_msg(end-1) = '.';
+error_msg        = error_msg(1:end-1);
 
-if(throwErr)
-   error(errorMsg)
+if(throw_err)
+   error(error_msg)
 end
 
 

@@ -1,4 +1,4 @@
-function y = stretchVec(x, ind, n, defaultVal)
+function y = stretchVec(x, ind, n, dft_val)
 %STRETCHVEC creates a new vector of a certain length from a smaller set of 
 % entries
 %
@@ -9,7 +9,7 @@ function y = stretchVec(x, ind, n, defaultVal)
 % USAGE:
 %    y = stretchVec(x, ind)
 %    y = stretchVec(x, ind, n)
-%    y = stretchVec(x, ind, n, defaultVal)
+%    y = stretchVec(x, ind, n, dft_val)
 %
 % INPUTS:
 %   x   - entries of the new vector
@@ -17,9 +17,8 @@ function y = stretchVec(x, ind, n, defaultVal)
 %         filled in
 %
 % OPTIONAL INPUTS:
-%   n          - length of the vector (default: max(ind))
-%   defaultVal - value at non-specified locations in new vector (default:
-%   0=
+%   n       - length of the vector (default: max(ind))
+%   dft_val - value at non-specified locations in new vector (default: 0)
 %
 % OUTPUTS:
 %   x - new vector such that y(ind) == x
@@ -27,7 +26,7 @@ function y = stretchVec(x, ind, n, defaultVal)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 30.10.2018
-%       last update     - 30.10.2018
+%       last update     - 24.09.2023
 %
 % See also cutArray, padArray, insertIntoArray
 
@@ -38,11 +37,11 @@ end
 
 % check user defined value for defaultVal, otherwise assign default value
 if(nargin < 4)
-    defaultVal = 0;
+    dft_val = 0;
 end
 
 
-y      = defaultVal * ones(n,1);
+y      = dft_val * ones(n,1);
 y(ind) = x;
 
 end

@@ -1,30 +1,22 @@
-function userDir = userdir()
-%FUNCTIONTEMPLATE is a template for a function describtion
+function user_dir = userDir()
+%USERDIR returns the path to the user's home directory
 %
 % DETAILS: 
-%   functionTemplate.m can be used as a template 
+%   userDir.m can be used to get the path to the user's home directory 
 %
 % USAGE:
-%   x = functionTemplate(y)
-%
-% INPUTS:
-%   y - bla bla
-%
-% OPTIONAL INPUTS:
-%   z    - bla bla
-%   para - a struct containing further optional parameters:
-%       'a' - parameter a
+%   path = userDir
 %
 % OUTPUTS:
-%   x - bla bla
+%   path to the 
 %
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 19.12.2018
-%       last update     - 19.12.2018
+%       last update     - 16.05.2023
 %
 % See also
 
-userDir = char(java.lang.System.getProperty('user.home'));
+user_dir = char(java.lang.System.getProperty('user.home'));
 
 end

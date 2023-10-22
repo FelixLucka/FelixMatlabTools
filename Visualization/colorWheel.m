@@ -1,25 +1,25 @@
-function RGB = colorWheel(nRes)
+function RGB = colorWheel(n_res)
 % COLORWHEEL returns an RBG to display the conversion of direction into color
 %
-%  RGB = colorWheel(nRes)
+%  RGB = colorWheel(n_res)
 %
 %  INPUTS:
-%   nRes    - number of pixels in one direction of the RGB that is returned
+%   n_res    - number of pixels in one direction of the RGB that is returned
 %
 %  OUTPUTS:
-%   RGB     - a nRes x nRes RGB containing the colors that are used to
+%   rgb     - a n_res x n_res RGB containing the colors that are used to
 %             display vectors with a corresponding direction and amplitude
 %             (the square is supposed to represent [-1,1]^2
 %
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 05.11.2018
-%       last update     - 05.11.2018
+%       last update     - 13.10.2023
 %
 % See also addColorFrame
 
 % create ndgrid
-[X, Y] = ndgrid(linspace(-1, 1, nRes),linspace(-1, 1, nRes));
+[X, Y] = ndgrid(linspace(-1, 1, n_res),linspace(-1, 1, n_res));
 RGB    = ones([size(X), 3]);
 
 % compute magitude and angle of mesh vectors

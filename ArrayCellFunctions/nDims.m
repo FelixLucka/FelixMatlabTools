@@ -1,4 +1,4 @@
-function ndim = nDims(X, ignoreSingleton)
+function ndim = nDims(X, ignore_singleton)
 %nDims is a replacement for ndims which does not return 1 in case of
 % column vectors
 %
@@ -28,10 +28,10 @@ function ndim = nDims(X, ignoreSingleton)
 
 % check user defined value for ignoreSingleton, otherwise assign default value
 if(nargin < 2)
-    ignoreSingleton = true;
+    ignore_singleton = true;
 end
 
-if(ignoreSingleton)
+if(ignore_singleton)
     % squeeze X and get the size of that
     sizeX = size(squeeze(X));
 else

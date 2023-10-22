@@ -1,4 +1,4 @@
-function sphere = makeSphere(Nxyz, gridLim, center, radius, nSubDiv)
+function sphere = makeSphere(n_xyz, grid_lim, center, radius, n_sub_div)
 %MAKESPHERE Creates a sphere within a 2D or 3D grid.
 %
 % DESCRIPTION:
@@ -9,13 +9,13 @@ function sphere = makeSphere(Nxyz, gridLim, center, radius, nSubDiv)
 %       sphere = makeSphere([101,101], [-1,1;-1,1], [0,0], 0.5, 4)
 %
 % INPUTS:
-%       Nxyz    - number of voxels in each spatial direction 
-%       gridLim - ndim x 2 array with the spatial limits of the grid 
-%       center  - centre of the sphere as [x,y] or [x,y,z]
-%       radius  - sphere radius
+%       n_xyz    - number of voxels in each spatial direction 
+%       grid_lim - ndim x 2 array with the spatial limits of the grid 
+%       center   - centre of the sphere as [x,y] or [x,y,z]
+%       radius   - sphere radius
 %
 % OPTIONAL INPUTS:
-%       nSubDiv - The voxels will be subdived to obtain a smooth representation
+%       n_sub_div - The voxels will be subdived to obtain a smooth representation
 %                 of the sphere. nSubDiv defines the number of
 %                 subdivisions in one dimension
 %
@@ -25,63 +25,63 @@ function sphere = makeSphere(Nxyz, gridLim, center, radius, nSubDiv)
 % ABOUT:
 %       author          - Felix Lucka
 %       date            - 08.07.2018
-%       last update     - 08.07.2018
+%       last update     - 29.09.2023
 %
 % See also
 
 
-% check for user defined value for nSubDiv, otherwise assign default value
+% check for user defined value for n_sub_div, otherwise assign default value
 if nargin < 5
-    nSubDiv = 2;
+    n_sub_div = 2;
 end
 
 % read out dimension and spacing dx
-dim      = length(Nxyz);
-dx       = diff(gridLim, 1 ,2)./Nxyz(:);
+dim      = length(n_xyz);
+dx       = diff(grid_lim, 1 ,2)./(n_xyz(:)-1);
 
 % create base grid
 for d=1:dim
-    baseGridVec{d} = linspace(gridLim(d,1), gridLim(d,2), Nxyz(d)+1);
-    baseGridVec{d} = (baseGridVec{d}(1:end-1) + baseGridVec{d}(2:end))/2;
+    base_grid_vec{d} = linspace(grid_lim(d,1), grid_lim(d,2), n_xyz(d)+1);
+    base_grid_vec{d} = (base_grid_vec{d}(1:end-1) + base_grid_vec{d}(2:end))/2;
 end
 
 % create subgrid around each source grid point
-subGridVec = linspace(-1,1,2*nSubDiv+1);
-subGridVec = subGridVec(2:2:end)/2;
+sub_grid_vec = linspace(-1,1,2*n_sub_div+1);
+sub_grid_vec = sub_grid_vec(2:2:end)/2;
         
 % create empty matrix
-sphere = zeros(Nxyz);
+sphere = zeros(n_xyz);
 
 switch dim
     case 2
-        [baseGridX, baseGridY] = ndgrid(baseGridVec{1},  baseGridVec{2});
-        [subGridX, subGridY] = ndgrid(dx(1) * subGridVec, dx(2)*subGridVec);
-        for iSubGrid=1:numel(subGridX)
-            shiftX = baseGridX + subGridX(iSubGrid);
-            shiftY = baseGridY + subGridY(iSubGrid);
-            sqDistCenter = (shiftX - center(1)).^2 + (shiftY - center(2)).^2;
-            inside = sqDistCenter < radius.^2;
+        [base_grid_x, base_grid_y] = ndgrid(base_grid_vec{1},  base_grid_vec{2});
+        [sub_grid_x,  sub_grid_y]  = ndgrid(dx(1) * sub_grid_vec, dx(2)*sub_grid_vec);
+        for i_sub_grid=1:numel(sub_grid_x)
+            shift_x = base_grid_x + sub_grid_x(i_sub_grid);
+            shift_y = base_grid_y + sub_grid_y(i_sub_grid);
+            sq_dist_center = (shift_x - center(1)).^2 + (shift_y - center(2)).^2;
+            inside = sq_dist_center < radius.^2;
             sphere = sphere + inside;
         end
     case 3
-        [baseGridX, baseGridY, baseGridZ] = ndgrid(baseGridVec{1},  ...
-            baseGridVec{2}, baseGridVec{3});
-        [subGridX, subGridY, subGridZ] = ndgrid(dx(1) * subGridVec, ...
-            dx(2) * subGridVec, dx(3) *subGridVec);
+        [base_grid_x, base_grid_y, base_grid_z] = ndgrid(base_grid_vec{1},  ...
+            base_grid_vec{2}, base_grid_vec{3});
+        [sub_grid_x, sub_grid_y, subGridZ] = ndgrid(dx(1) * sub_grid_vec, ...
+            dx(2) * sub_grid_vec, dx(3) *sub_grid_vec);
         
-        for iSubGrid=1:numel(subGridX)
-            shiftX = baseGridX + subGridX(iSubGrid);
-            shiftY = baseGridY + subGridY(iSubGrid);
-            shiftZ = baseGridZ + subGridZ(iSubGrid);
-            sqDistCenter = (shiftX - center(1)).^2 + (shiftY - center(2)).^2 ...
-                + (shiftZ - center(3)).^2;
-            inside = sqDistCenter < radius.^2;
+        for i_sub_grid=1:numel(sub_grid_x)
+            shift_x = base_grid_x + sub_grid_x(i_sub_grid);
+            shift_y = base_grid_y + sub_grid_y(i_sub_grid);
+            shift_z = base_grid_z + subGridZ(i_sub_grid);
+            sq_dist_center = (shift_x - center(1)).^2 + (shift_y - center(2)).^2 ...
+                + (shift_z - center(3)).^2;
+            inside = sq_dist_center < radius.^2;
             sphere = sphere + inside;
         end
         
     otherwise
         notImpErr
 end
-sphere = sphere/numel(subGridX);
+sphere = sphere/numel(sub_grid_x);
 
 end

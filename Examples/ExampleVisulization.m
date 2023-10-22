@@ -191,6 +191,15 @@ subplot(1,3,1); imagesc(im1); colormap gray
 subplot(1,3,2); imagesc(im2); colormap gray
 subplot(1,3,3); image(RGB)
 
+% arrange multipe RGBs to one
+RGBcell = {};
+nRGB    = 14;
+for iRGB=1:nRGB
+    RGBcell{iRGB} = cat(3, iRGB/nRGB * ones(100,100), randn(100,100), rand(100,100));
+end
+    
+RBG = arrangeRGB(RGBcell, [], 30, str2RGB('green'));
+
 %% volume rendering
 ccc
 
@@ -240,7 +249,7 @@ ccc
 % % retruned by contour.m
 C = contour(peaks(200)); close all force
 [LinesCell, Values] = extractContourLines(C);
-cMap                = getColorMap('green',length(LinesCell));
+cMap                = getColormap('green',length(LinesCell));
 figure();
 for i=1:length(LinesCell)
     plot(LinesCell(i).x, LinesCell(i).y, 'Color', cMap(i,:), 'LineWidth', 1); 

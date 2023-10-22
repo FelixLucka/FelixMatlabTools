@@ -1,6 +1,8 @@
 function result = meshSlicePlot(nodes, elements, para)
 
-    
+%%%%%%%%%% OUTDATED AND UNDOCUMENTED %%%%%%%%%%%%%%%%%%%%%%%%%
+
+
     % what should be plotted?
     %[colors df_fl] = check_and_assign_struc(para,'colors','double',0);
 %     if(df_fl)

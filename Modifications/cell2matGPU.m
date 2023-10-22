@@ -4,7 +4,7 @@ function m = cell2matGPU(c)
 % ABOUT:
 %       modified by     - Felix Lucka
 %       date            - 16.01.2020
-%       last update     - 16.01.2020
+%       last update     - 16.05.2023
 %
 % See also cell2mat
 
@@ -26,16 +26,16 @@ if elements == 1
     end
 end
 % Error out if cell array contains mixed data types
-cellclass = class(c{1});
-ciscellclass = cellfun('isclass',c,cellclass);
-if ~all(ciscellclass(:))
+cell_class = class(c{1});
+c_is_cell_class = cellfun('isclass',c,cell_class);
+if ~all(c_is_cell_class(:))
     error(message('MATLAB:cell2mat:MixedDataTypes'));
 end
 
 % Error out if cell array contains any cell arrays or objects
-ciscell = iscell(c{1});
-cisobj = isobject(c{1}) & not(isa(c{1}, 'gpuArray'));
-if cisobj || ciscell
+c_is_cell = iscell(c{1});
+c_is_obj  = isobject(c{1}) & not(isa(c{1}, 'gpuArray'));
+if c_is_obj || c_is_cell
     error(message('MATLAB:cell2mat:UnsupportedCellContent'));
 end
 
